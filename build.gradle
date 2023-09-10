@@ -1,0 +1,71 @@
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'org.springframework.boot' version '3.1.2'
+    id 'io.spring.dependency-management' version '1.1.2'
+}
+
+group = 'dev.nos'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    integration_testImplementation.extendsFrom(testImplementation)
+    integration_testRuntimeOnly.extendsFrom(testRuntimeOnly)
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    integration_test {
+        groovy {
+            srcDir "$projectDir/src/integration_test/groovy"
+            resources.srcDir "$projectDir/src/integration_test/resources"
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+        }
+    }
+}
+
+tasks.register('integrationTest', Test) {
+    useJUnitPlatform()
+    description = "Run integration tests"
+    group = "verification"
+    testClassesDirs = sourceSets.integration_test.output.classesDirs
+    classpath = sourceSets.integration_test.runtimeClasspath
+}
+
+
+dependencies {
+    compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.unbroken-dome.base62:base62:1.1.0'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+    testRuntimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.h2database:h2'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework:spring-webflux'
+    testRuntimeOnly 'org.apache.groovy:groovy-all:4.0.14'
+    testImplementation 'org.apache.groovy:groovy-json:4.0.14'
+    testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
+    testImplementation 'org.spockframework:spock-spring:2.3-groovy-4.0'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
