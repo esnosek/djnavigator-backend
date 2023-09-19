@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.function.Function;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
 @Service
@@ -36,7 +35,7 @@ public class SpotifyPlaylistConverter implements Function<JsonNode, SpotifyPlayl
         return stream(arrayNode.spliterator(), false)
                 .map(item -> item.get("track"))
                 .map(spotifyTrackConverter)
-                .collect(toList());
+                .toList();
     }
 
 }

@@ -1,56 +1,59 @@
-package dev.nos.djnavigator.controller.converters;
+package dev.nos.djnavigator.controller.creator.model;
 
+import dev.nos.djnavigator.controller.exception.AlbumNotFoundException;
+import dev.nos.djnavigator.dto.TrackCreateDto;
 import dev.nos.djnavigator.model.Album;
+import dev.nos.djnavigator.model.Track;
 import dev.nos.djnavigator.repository.AlbumRepository;
+import dev.nos.djnavigator.spotify.SpotifyTrackResolver;
 import dev.nos.djnavigator.spotify.client.SpotifyQueries;
-import dev.nos.djnavigator.spotify.client.SpotifyTrackResolver;
 import dev.nos.djnavigator.spotify.model.SpotifyAlbum;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AlbumWithTrackCreator {
+public class TrackWithAlbumCreator {
+
     private final TrackCreator trackCreator;
+    private final AlbumRepository albumRepository;
+    private final SpotifyTrackResolver spotifyTrackResolver;
     private final AlbumCreator albumCreator;
     private final SpotifyQueries spotifyQueries;
-    private final SpotifyTrackResolver spotifyTrackResolver;
-    private final AlbumRepository albumRepository;
 
-    public AlbumWithTrackCreator(TrackCreator trackCreator,
-                                 AlbumCreator albumCreator,
-                                 SpotifyQueries spotifyQueries,
+    public TrackWithAlbumCreator(TrackCreator trackCreator,
+                                 AlbumRepository albumRepository,
                                  SpotifyTrackResolver spotifyTrackResolver,
-                                 AlbumRepository albumRepository) {
+                                 AlbumCreator albumCreator,
+                                 SpotifyQueries spotifyQueries) {
         this.trackCreator = trackCreator;
+        this.albumRepository = albumRepository;
+        this.spotifyTrackResolver = spotifyTrackResolver;
         this.albumCreator = albumCreator;
         this.spotifyQueries = spotifyQueries;
-        this.spotifyTrackResolver = spotifyTrackResolver;
-        this.albumRepository = albumRepository;
     }
 
-    public Album createAlbumWithTracks(String spotifyAlbumId) {
-        final var album = findAlbumBySpotifyIdOrCreate(spotifyAlbumId);
-        spotifyTrackResolver
-                .tracksWithAudioFeatures(spotifyAlbumId)
-                .stream()
-                .map(spotifyTrack -> trackCreator
-                        .toTrack(spotifyTrack)
-                        .withAlbum(album))
-                .forEach(album::addTrack);
-        return album;
+    public Track createTrackWithAlbum(TrackCreateDto trackCreateDto) {
+        final var album = findAlbumOrThrow(trackCreateDto.albumId());
+        return trackCreator
+                .toTrack(trackCreateDto)
+                .withAlbum(album);
     }
 
-    public Album createAlbumWithTrack(String spotifyTrackId) {
+    public Track createTrackWithAlbum(String spotifyTrackId) {
         final var spotifyTrack = spotifyTrackResolver.trackWithAudioFeature(spotifyTrackId);
         final var spotifyAlbumId = spotifyTrack
                 .spotifyAlbum()
                 .map(SpotifyAlbum::spotifyId)
                 .orElseThrow();
         final var album = findAlbumBySpotifyIdOrCreate(spotifyAlbumId);
-        final var track = trackCreator
+        return trackCreator
                 .toTrack(spotifyTrack)
                 .withAlbum(album);
-        album.addTrack(track);
-        return album;
+    }
+
+    private Album findAlbumOrThrow(String albumId) {
+        return albumRepository
+                .findById(albumId)
+                .orElseThrow(() -> new AlbumNotFoundException(albumId));
     }
 
     private Album findAlbumBySpotifyIdOrCreate(String spotifyAlbumId) {
@@ -60,5 +63,4 @@ public class AlbumWithTrackCreator {
                         albumCreator.createAlbum(spotifyQueries.getAlbumWithTracks(spotifyAlbumId))
                 );
     }
-
 }

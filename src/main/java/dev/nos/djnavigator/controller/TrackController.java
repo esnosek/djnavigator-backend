@@ -1,9 +1,8 @@
 package dev.nos.djnavigator.controller;
 
-import dev.nos.djnavigator.controller.converters.AlbumCreator;
-import dev.nos.djnavigator.controller.converters.AlbumWithTrackCreator;
-import dev.nos.djnavigator.controller.converters.TrackCreator;
-import dev.nos.djnavigator.controller.converters.TrackWithAlbumCreator;
+import dev.nos.djnavigator.controller.creator.model.AlbumWithTrackCreator;
+import dev.nos.djnavigator.controller.creator.model.TrackWithAlbumCreator;
+import dev.nos.djnavigator.controller.creator.view.TrackViewWithAlbumCreator;
 import dev.nos.djnavigator.controller.exception.AlbumNotFoundException;
 import dev.nos.djnavigator.controller.exception.TrackNotFoundException;
 import dev.nos.djnavigator.dto.TrackCreateDto;
@@ -27,22 +26,19 @@ public class TrackController {
 
     private final TrackRepository trackRepository;
     private final AlbumRepository albumRepository;
-    private final TrackCreator trackCreator;
-    private final AlbumCreator albumCreator;
+    private final TrackViewWithAlbumCreator trackViewWithAlbumCreator;
     private final TrackWithAlbumCreator trackWithAlbumCreator;
     private final AlbumWithTrackCreator albumWithTrackCreator;
 
     @Autowired
     public TrackController(TrackRepository trackRepository,
                            AlbumRepository albumRepository,
-                           TrackCreator trackCreator,
-                           AlbumCreator albumCreator,
+                           TrackViewWithAlbumCreator trackViewWithAlbumCreator,
                            TrackWithAlbumCreator trackWithAlbumCreator,
                            AlbumWithTrackCreator albumWithTrackCreator) {
         this.trackRepository = trackRepository;
         this.albumRepository = albumRepository;
-        this.trackCreator = trackCreator;
-        this.albumCreator = albumCreator;
+        this.trackViewWithAlbumCreator = trackViewWithAlbumCreator;
         this.trackWithAlbumCreator = trackWithAlbumCreator;
         this.albumWithTrackCreator = albumWithTrackCreator;
     }
@@ -53,8 +49,7 @@ public class TrackController {
         final var track = trackRepository.save(
                 trackWithAlbumCreator.createTrackWithAlbum(trackCreateDto)
         );
-        return trackCreator.toTrackView(track)
-                .withAlbum(albumCreator.toAlbumView(track.getAlbum()));
+        return trackViewWithAlbumCreator.trackViewWithAlbum(track);
     }
 
     @PostMapping("/spotify-tracks")
@@ -63,16 +58,14 @@ public class TrackController {
                 albumWithTrackCreator.createAlbumWithTrack(spotifyTrackId)
         );
         final var track = trackRepository.findBySpotifyId(spotifyTrackId);
-        return trackCreator.toTrackView(track)
-                .withAlbum(albumCreator.toAlbumView(track.getAlbum()));
+        return trackViewWithAlbumCreator.trackViewWithAlbum(track);
     }
 
     @GetMapping("/tracks/{trackId}")
     public TrackView getTrack(@PathVariable String trackId) {
         final var track = trackRepository.findById(trackId)
                 .orElseThrow(() -> new TrackNotFoundException(trackId));
-        return trackCreator.toTrackView(track)
-                .withAlbum(albumCreator.toAlbumView(track.getAlbum()));
+        return trackViewWithAlbumCreator.trackViewWithAlbum(track);
     }
 
     @GetMapping("tracks")
@@ -81,10 +74,7 @@ public class TrackController {
                 ? allTracks()
                 : albumTracks(albumId);
         return tracks
-                .map(track -> trackCreator
-                        .toTrackView(track)
-                        .withAlbum(albumCreator.toAlbumView(track.getAlbum()))
-                )
+                .map(trackViewWithAlbumCreator::trackViewWithAlbum)
                 .toList();
     }
 

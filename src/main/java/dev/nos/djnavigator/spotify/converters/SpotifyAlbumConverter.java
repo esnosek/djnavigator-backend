@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.function.Function;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
 
 @Service
@@ -29,6 +28,6 @@ public class SpotifyAlbumConverter implements Function<JsonNode, SpotifyAlbum> {
         final var artists = (ArrayNode) album.get("artists");
         return stream(artists.spliterator(), false)
                 .map(artist -> artist.get("name").asText())
-                .collect(toList());
+                .toList();
     }
 }

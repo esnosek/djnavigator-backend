@@ -13,13 +13,13 @@ import java.net.URI;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Service
-public class SpotifyClient {
+class SpotifyClient {
 
     private final SpotifyTokenRetriever spotifyTokenRetriever;
     private final RestTemplate restTemplate;
 
     @Autowired
-    private SpotifyClient(SpotifyTokenRetriever spotifyTokenRetriever, RestTemplate restTemplate) {
+    SpotifyClient(SpotifyTokenRetriever spotifyTokenRetriever, RestTemplate restTemplate) {
         this.spotifyTokenRetriever = spotifyTokenRetriever;
         this.restTemplate = restTemplate;
     }

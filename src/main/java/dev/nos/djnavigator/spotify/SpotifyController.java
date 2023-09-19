@@ -1,7 +1,6 @@
 package dev.nos.djnavigator.spotify;
 
 import dev.nos.djnavigator.spotify.client.SpotifyQueries;
-import dev.nos.djnavigator.spotify.client.SpotifyTrackResolver;
 import dev.nos.djnavigator.spotify.model.SpotifyAlbum;
 import dev.nos.djnavigator.spotify.model.SpotifyPlaylist;
 import dev.nos.djnavigator.spotify.model.SpotifySearchResults;
@@ -28,9 +27,9 @@ class SpotifyController {
         return spotifyQueries.searchAlbumOrTrack(query, limit);
     }
 
-    @GetMapping("/tracks/{trackId}")
-    public SpotifyTrack getSpotifyTrack(@PathVariable String trackId) {
-        return spotifyQueries.getTrackWithAlbum(trackId);
+    @GetMapping("/tracks/{spotifyTrackId}")
+    public SpotifyTrack getSpotifyTrack(@PathVariable String spotifyTrackId) {
+        return spotifyTrackResolver.trackWithAudioFeature(spotifyTrackId);
     }
 
     @GetMapping("/albums/{albumId}")

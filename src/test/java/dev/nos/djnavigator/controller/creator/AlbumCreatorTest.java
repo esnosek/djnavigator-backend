@@ -1,14 +1,15 @@
-package dev.nos.djnavigator.controller.converters;
+package dev.nos.djnavigator.controller.creator;
 
-import dev.nos.djnavigator.dto.AlbumView;
+import dev.nos.djnavigator.controller.creator.model.AlbumCreator;
 import dev.nos.djnavigator.model.Album;
 import org.junit.jupiter.api.Test;
 
-import static dev.nos.djnavigator.TestData.*;
+import static dev.nos.djnavigator.TestData.albumCreateDto;
+import static dev.nos.djnavigator.TestData.spotifyAlbum;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.from;
 
-class AlbumConverterTest {
+class AlbumCreatorTest {
 
     private final AlbumCreator albumCreator = new AlbumCreator();
 
@@ -44,21 +45,4 @@ class AlbumConverterTest {
                 .returns(spotifyAlbum.spotifyId(), from(Album::getSpotifyId));
     }
 
-    @Test
-    void should_ToAlbumView_Album_ReturnAlbumView() {
-        // given
-        final var album = album().build();
-
-        // when
-        final var albumView = albumCreator.toAlbumView(album);
-
-        // then
-        assertThat(albumView)
-                .returns(album.getId(), from(AlbumView::id))
-                .returns(album.getCreatedDate(), from(AlbumView::createdDate))
-                .returns(album.getArtists(), from(AlbumView::artists))
-                .returns(album.getName(), from(AlbumView::name))
-                .returns(null, from(AlbumView::tracks))
-                .returns(album.getSpotifyId(), from(AlbumView::spotifyId));
-    }
 }

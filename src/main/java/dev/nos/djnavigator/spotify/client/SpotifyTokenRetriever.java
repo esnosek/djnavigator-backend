@@ -30,7 +30,7 @@ class SpotifyTokenRetriever {
     private OAuthToken token = null;
 
     @Autowired
-    private SpotifyTokenRetriever(RestTemplate restTemplate, SpotifyCredentials spotifyCredentials) {
+    SpotifyTokenRetriever(RestTemplate restTemplate, SpotifyCredentials spotifyCredentials) {
         this.spotifyCredentials = spotifyCredentials;
         this.restTemplate = restTemplate;
     }

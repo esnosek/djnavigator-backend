@@ -1,5 +1,6 @@
-package dev.nos.djnavigator.spotify.client;
+package dev.nos.djnavigator.spotify;
 
+import dev.nos.djnavigator.spotify.client.SpotifyQueries;
 import dev.nos.djnavigator.spotify.model.SpotifyAlbum;
 import dev.nos.djnavigator.spotify.model.SpotifyTrack;
 import org.springframework.beans.factory.annotation.Autowired;

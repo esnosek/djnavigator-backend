@@ -27,12 +27,12 @@ public class SpotifyQueries {
     private final SpotifyPlaylistConverter spotifyPlaylistConverter;
 
     @Autowired
-    public SpotifyQueries(SpotifyClient spotifyClient,
-                          SpotifySearchResultsConverter spotifySearchResultsConverter,
-                          SpotifyAlbumConverter spotifyAlbumConverter,
-                          SpotifyTrackConverter spotifyTrackConverter,
-                          SpotifyTrackAudioFeaturesConverter spotifyTrackAudioFeaturesConverter,
-                          SpotifyPlaylistConverter spotifyPlaylistConverter) {
+    SpotifyQueries(SpotifyClient spotifyClient,
+                   SpotifySearchResultsConverter spotifySearchResultsConverter,
+                   SpotifyAlbumConverter spotifyAlbumConverter,
+                   SpotifyTrackConverter spotifyTrackConverter,
+                   SpotifyTrackAudioFeaturesConverter spotifyTrackAudioFeaturesConverter,
+                   SpotifyPlaylistConverter spotifyPlaylistConverter) {
         this.spotifyClient = spotifyClient;
         this.spotifySearchResultsConverter = spotifySearchResultsConverter;
         this.spotifyAlbumConverter = spotifyAlbumConverter;

@@ -1,7 +1,6 @@
-package dev.nos.djnavigator.controller.converters;
+package dev.nos.djnavigator.controller.creator.model;
 
 import dev.nos.djnavigator.dto.AlbumCreateDto;
-import dev.nos.djnavigator.dto.AlbumView;
 import dev.nos.djnavigator.model.Album;
 import dev.nos.djnavigator.spotify.model.SpotifyAlbum;
 import org.springframework.stereotype.Service;
@@ -32,17 +31,6 @@ public class AlbumCreator {
                 .artists(spotifyAlbum.artists())
                 .spotifyId(spotifyAlbum.spotifyId())
                 .imagePath(spotifyAlbum.imagePath())
-                .build();
-    }
-
-    public AlbumView toAlbumView(Album album) {
-        return AlbumView.builder()
-                .id(album.getId())
-                .createdDate(album.getCreatedDate())
-                .name(album.getName())
-                .artists(album.getArtists())
-                .spotifyId(album.getSpotifyId())
-                .imagePath(album.getImagePath())
                 .build();
     }
 

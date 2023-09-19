@@ -1,7 +1,6 @@
-package dev.nos.djnavigator.controller.converters;
+package dev.nos.djnavigator.controller.creator.model;
 
 import dev.nos.djnavigator.dto.TrackCreateDto;
-import dev.nos.djnavigator.dto.TrackView;
 import dev.nos.djnavigator.model.Track;
 import dev.nos.djnavigator.spotify.model.SpotifyTrack;
 import dev.nos.djnavigator.spotify.model.SpotifyTrackAudioFeatures;
@@ -34,17 +33,6 @@ public class TrackCreator {
                 .artists(spotifyTrack.artists())
                 .spotifyId(spotifyTrack.spotifyId())
                 .tempo(spotifyTrack.audioFeatures().map(SpotifyTrackAudioFeatures::tempo).orElse(null))
-                .build();
-    }
-
-    public TrackView toTrackView(Track track) {
-        return TrackView.builder()
-                .id(track.getId())
-                .createdDate(track.getCreatedDate())
-                .name(track.getName())
-                .artists(track.getArtists())
-                .tempo(track.getTempo())
-                .spotifyId(track.getSpotifyId())
                 .build();
     }
 

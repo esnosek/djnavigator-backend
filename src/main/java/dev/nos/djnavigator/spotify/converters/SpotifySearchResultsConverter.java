@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.StreamSupport;
 
-import static java.util.stream.Collectors.toList;
-
 @Service
 public class SpotifySearchResultsConverter implements Function<JsonNode, SpotifySearchResults> {
 
@@ -21,7 +19,8 @@ public class SpotifySearchResultsConverter implements Function<JsonNode, Spotify
     private final SpotifyTrackConverter spotifyTrackConverter;
 
     @Autowired
-    public SpotifySearchResultsConverter(SpotifyAlbumConverter spotifyAlbumConverter, SpotifyTrackConverter spotifyTrackConverter) {
+    public SpotifySearchResultsConverter(SpotifyAlbumConverter spotifyAlbumConverter,
+                                         SpotifyTrackConverter spotifyTrackConverter) {
         this.spotifyAlbumConverter = spotifyAlbumConverter;
         this.spotifyTrackConverter = spotifyTrackConverter;
     }
@@ -38,14 +37,14 @@ public class SpotifySearchResultsConverter implements Function<JsonNode, Spotify
         final var arrayNode = (ArrayNode) albums.get("items");
         return StreamSupport.stream(arrayNode.spliterator(), false)
                 .map(spotifyAlbumConverter)
-                .collect(toList());
+                .toList();
     }
 
     private List<SpotifyTrack> toSpotifyTracks(JsonNode tracks) {
         final var arrayNode = (ArrayNode) tracks.get("items");
         return StreamSupport.stream(arrayNode.spliterator(), false)
                 .map(spotifyTrackConverter)
-                .collect(toList());
+                .toList();
     }
 
 }
