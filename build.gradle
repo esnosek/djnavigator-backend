@@ -6,7 +6,12 @@ plugins {
 }
 
 group = 'dev.nos'
-version = '0.0.1-SNAPSHOT'
+version = '1.0.0'
+
+jar {
+    archiveBaseName = 'dj-navigator-backend'
+    archiveVersion = '1.0.0'
+}
 
 java {
     sourceCompatibility = '17'
@@ -43,9 +48,15 @@ tasks.register('integrationTest', Test) {
     classpath = sourceSets.integration_test.runtimeClasspath
 }
 
+tasks.withType(Copy).configureEach {
+    duplicatesStrategy 'exclude'
+}
 
 dependencies {
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
     compileOnly 'org.springframework.boot:spring-boot-starter-webflux'
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-logging'
@@ -53,17 +64,16 @@ dependencies {
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.unbroken-dome.base62:base62:1.1.0'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
-    testRuntimeOnly 'com.h2database:h2'
-    runtimeOnly 'com.h2database:h2'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    implementation 'org.postgresql:postgresql'
 
+    testImplementation 'net.javacrumbs.json-unit:json-unit-assertj:3.2.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework:spring-webflux'
-    testRuntimeOnly 'org.apache.groovy:groovy-all:4.0.14'
     testImplementation 'org.apache.groovy:groovy-json:4.0.14'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'org.spockframework:spock-spring:2.3-groovy-4.0'
+    testRuntimeOnly 'org.apache.groovy:groovy-all:4.0.14'
+    testRuntimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {

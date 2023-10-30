@@ -1,9 +1,9 @@
 package dev.nos.djnavigator;
 
-import dev.nos.djnavigator.dto.AlbumCreateDto;
-import dev.nos.djnavigator.dto.TrackCreateDto;
-import dev.nos.djnavigator.model.Album;
-import dev.nos.djnavigator.model.Track;
+import dev.nos.djnavigator.collection.dto.AlbumCreateDto;
+import dev.nos.djnavigator.collection.dto.TrackCreateDto;
+import dev.nos.djnavigator.collection.model.Album;
+import dev.nos.djnavigator.collection.model.Track;
 import dev.nos.djnavigator.spotify.model.SpotifyAlbum;
 import dev.nos.djnavigator.spotify.model.SpotifyTrack;
 import dev.nos.djnavigator.spotify.model.SpotifyTrackAudioFeatures;
@@ -13,7 +13,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.UUID.randomUUID;
 
@@ -31,8 +30,6 @@ public class TestData {
 
     public static Album.AlbumBuilder album() {
         return Album.builder()
-                .id(Base62.encodeUUID(randomUUID()))
-                .createdDate(LocalDateTime.now())
                 .name("album name")
                 .artists(List.of("artist1", "artist2"))
                 .spotifyId("spotifyId");
@@ -41,11 +38,11 @@ public class TestData {
 
     public static SpotifyTrack.SpotifyTrackBuilder spotifyTrack() {
         return SpotifyTrack.builder()
-                .spotifyId("spotifyId")
+                .spotifyId(Base62.encodeUUID(randomUUID()))
                 .name("spotify track name")
                 .artists(List.of("artist1", "artist2"))
-                .audioFeatures(of(spotifyTrackAudioFeatures().build()))
-                .spotifyAlbum(empty());
+                .audioFeatures(spotifyTrackAudioFeatures().build())
+                .spotifyAlbum(spotifyAlbum().build());
     }
 
     public static SpotifyTrackAudioFeatures.SpotifyTrackAudioFeaturesBuilder spotifyTrackAudioFeatures() {
@@ -55,10 +52,10 @@ public class TestData {
 
     public static SpotifyAlbum.SpotifyAlbumBuilder spotifyAlbum() {
         return SpotifyAlbum.builder()
-                .spotifyId("spotifyId")
+                .spotifyId(Base62.encodeUUID(randomUUID()))
                 .name("spotify album name")
                 .artists(List.of("artist1", "artist2"))
-                .spotifyTracks(empty());
+                .spotifyTracks(List.of());
     }
 
     public static TrackCreateDto.TrackCreateDtoBuilder trackCreateDto() {

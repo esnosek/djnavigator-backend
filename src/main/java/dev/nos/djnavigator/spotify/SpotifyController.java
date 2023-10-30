@@ -13,13 +13,10 @@ import org.springframework.web.bind.annotation.*;
 class SpotifyController {
 
     private final SpotifyQueries spotifyQueries;
-    private final SpotifyTrackResolver spotifyTrackResolver;
 
     @Autowired
-    public SpotifyController(SpotifyQueries spotifyQueries,
-                             SpotifyTrackResolver spotifyTrackResolver) {
+    public SpotifyController(SpotifyQueries spotifyQueries) {
         this.spotifyQueries = spotifyQueries;
-        this.spotifyTrackResolver = spotifyTrackResolver;
     }
 
     @GetMapping("/search")
@@ -29,16 +26,16 @@ class SpotifyController {
 
     @GetMapping("/tracks/{spotifyTrackId}")
     public SpotifyTrack getSpotifyTrack(@PathVariable String spotifyTrackId) {
-        return spotifyTrackResolver.trackWithAudioFeature(spotifyTrackId);
+        return spotifyQueries.trackWithAudioFeature(spotifyTrackId);
     }
 
     @GetMapping("/albums/{albumId}")
     public SpotifyAlbum getSpotifyAlbum(@PathVariable String albumId) {
-        return spotifyTrackResolver.albumWithTracksAndAudioFeatures(albumId);
+        return spotifyQueries.albumWithTracksAndAudioFeatures(albumId);
     }
 
     @GetMapping("/playlists/{playlistId}")
     public SpotifyPlaylist getSpotifyPlaylist(@PathVariable String playlistId) {
-        return spotifyQueries.getPlaylist(playlistId);
+        return spotifyQueries.playlist(playlistId);
     }
 }

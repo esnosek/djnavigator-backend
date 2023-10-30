@@ -1,22 +1,18 @@
 package dev.nos.djnavigator.spotify.client;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
-
-import java.time.Instant;
 import java.util.Date;
 
-@AllArgsConstructor
-@ToString
-class OAuthToken {
+import static java.time.Instant.now;
 
-    @Getter
-    private final String token;
-    private final Date expirationDate;
+public record OAuthToken(String token, Date expirationDate) {
 
-    boolean isExpired() {
-        return Date.from(Instant.now().plusSeconds(60))
+    String value() {
+        return token;
+    }
+
+    boolean needToRefresh() {
+        return Date
+                .from(now().plusSeconds(60))
                 .after(expirationDate);
     }
 }

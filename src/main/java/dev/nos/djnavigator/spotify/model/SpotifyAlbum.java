@@ -1,23 +1,22 @@
 package dev.nos.djnavigator.spotify.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
-import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
-import java.util.Optional;
 
 @Builder
-@Jacksonized
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record SpotifyAlbum(
         String spotifyId,
         String name,
         List<String> artists,
-        Optional<List<SpotifyTrack>> spotifyTracks,
+        List<SpotifyTrack> spotifyTracks,
         String imagePath
 ) {
     public SpotifyAlbum withSpotifyTracks(List<SpotifyTrack> spotifyTracks) {
         return copy()
-                .spotifyTracks(Optional.of(spotifyTracks))
+                .spotifyTracks(spotifyTracks)
                 .build();
     }
 
