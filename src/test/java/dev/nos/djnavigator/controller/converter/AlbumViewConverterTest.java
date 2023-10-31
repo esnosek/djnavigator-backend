@@ -20,7 +20,7 @@ class AlbumViewConverterTest {
 
         // then
         assertThat(albumView)
-                .returns(album.getId().id(), from(AlbumView::id))
+                .returns(album.getId(), from(AlbumView::id))
                 .returns(album.getCreatedDate(), from(AlbumView::createdDate))
                 .returns(album.getArtists(), from(AlbumView::artists))
                 .returns(album.getName(), from(AlbumView::name))

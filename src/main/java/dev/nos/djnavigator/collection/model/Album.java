@@ -1,6 +1,8 @@
 package dev.nos.djnavigator.collection.model;
 
 import dev.nos.djnavigator.collection.model.converter.StringListConverter;
+import dev.nos.djnavigator.collection.model.id.AlbumId;
+import dev.nos.djnavigator.collection.model.id.AlbumSpotifyId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,17 +28,24 @@ public class Album {
     @AttributeOverride(name = "idValue", column = @Column(name = "id"))
     @Builder.Default
     private AlbumId id = AlbumId.randomId();
+
     @Temporal(TemporalType.TIMESTAMP)
     @Builder.Default
     private LocalDateTime createdDate = now().truncatedTo(MILLIS);
+
     private String name;
+
     @Convert(converter = StringListConverter.class)
     private List<String> artists;
+
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Track> tracks = new ArrayList<>();
-    @Column(name = "spotify_id")
-    private String spotifyId;
+
+    @Embedded
+    @AttributeOverride(name = "idValue", column = @Column(name = "spotify_id"))
+    private AlbumSpotifyId spotifyId;
+
     @Column(name = "image_path")
     private String imagePath;
 

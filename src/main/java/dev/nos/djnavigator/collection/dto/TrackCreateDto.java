@@ -1,5 +1,6 @@
 package dev.nos.djnavigator.collection.dto;
 
+import dev.nos.djnavigator.collection.model.id.AlbumId;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 
@@ -13,7 +14,7 @@ public record TrackCreateDto(
         String name,
         @NotEmpty(message = "artists has to be present")
         List<@NotEmpty(message = "artist name has to be present") String> artists,
-        String albumId,
+        AlbumId albumId,
         Optional<BigDecimal> tempo
 ) {
 }

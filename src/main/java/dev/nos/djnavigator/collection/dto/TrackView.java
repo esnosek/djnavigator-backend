@@ -2,6 +2,9 @@ package dev.nos.djnavigator.collection.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.nos.djnavigator.collection.model.id.TrackId;
+import dev.nos.djnavigator.collection.model.id.TrackSpotifyId;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -11,29 +14,22 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record TrackView(
-        String id,
+        TrackId id,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
         LocalDateTime createdDate,
         String name,
         List<String> artists,
         BigDecimal tempo,
-        String spotifyId,
+        TrackSpotifyId spotifyId,
         AlbumView album
 ) {
-    public TrackView withAlbum(AlbumView album) {
-        return copy()
-                .album(album)
-                .build();
+    @JsonProperty("id")
+    public String getId() {
+        return id.id();
     }
 
-    private TrackViewBuilder copy() {
-        return TrackView.builder()
-                .id(this.id)
-                .createdDate(this.createdDate)
-                .name(this.name)
-                .artists(this.artists)
-                .tempo(this.tempo)
-                .spotifyId(this.spotifyId)
-                .album(this.album);
+    @JsonProperty("spotifyId")
+    public String getSpotifyAlbumId() {
+        return spotifyId != null ? spotifyId.id() : null;
     }
 }

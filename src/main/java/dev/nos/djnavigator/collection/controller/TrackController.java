@@ -7,8 +7,10 @@ import dev.nos.djnavigator.collection.controller.exception.TrackNotFoundExceptio
 import dev.nos.djnavigator.collection.dto.TrackCreateDto;
 import dev.nos.djnavigator.collection.dto.TrackView;
 import dev.nos.djnavigator.collection.model.Album;
-import dev.nos.djnavigator.collection.model.AlbumId;
 import dev.nos.djnavigator.collection.model.Track;
+import dev.nos.djnavigator.collection.model.id.AlbumId;
+import dev.nos.djnavigator.collection.model.id.TrackId;
+import dev.nos.djnavigator.collection.model.id.TrackSpotifyId;
 import dev.nos.djnavigator.collection.repository.AlbumRepository;
 import dev.nos.djnavigator.collection.repository.TrackRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,23 +53,23 @@ public class TrackController {
     }
 
     @PostMapping("/spotify-tracks")
-    public TrackView addSpotifyTrack(@RequestParam(name = "id") String spotifyTrackId) {
+    public TrackView addSpotifyTrack(@RequestParam(name = "id") TrackSpotifyId trackSpotifyId) {
         albumRepository.save(
-                albumWithTrackCreator.createAlbumWithTrack(spotifyTrackId)
+                albumWithTrackCreator.createAlbumWithTrack(trackSpotifyId)
         );
-        final var track = trackRepository.findBySpotifyId(spotifyTrackId);
+        final var track = trackRepository.findBySpotifyId(trackSpotifyId);
         return toTrackView(track, true);
     }
 
     @GetMapping("/tracks/{trackId}")
-    public TrackView getTrack(@PathVariable String trackId) {
+    public TrackView getTrack(@PathVariable TrackId trackId) {
         final var track = trackRepository.findById(trackId)
                 .orElseThrow(() -> new TrackNotFoundException(trackId));
         return toTrackView(track, true);
     }
 
     @GetMapping("tracks")
-    public List<TrackView> getTracks(@RequestParam(required = false) String albumId) {
+    public List<TrackView> getTracks(@RequestParam(required = false) AlbumId albumId) {
         final var tracks = null == albumId
                 ? allTracks()
                 : albumTracks(albumId);
@@ -77,11 +79,11 @@ public class TrackController {
     }
 
     @DeleteMapping("/tracks/{trackId}")
-    public void deleteTrack(@PathVariable String trackId) {
+    public void deleteTrack(@PathVariable TrackId trackId) {
         trackRepository.deleteById(trackId);
     }
 
-    private Stream<Track> albumTracks(String albumId) {
+    private Stream<Track> albumTracks(AlbumId albumId) {
         final var album = findAlbumOrThrow(albumId);
         return trackRepository.findByAlbumId(album.getId())
                 .stream();
@@ -91,8 +93,8 @@ public class TrackController {
         return stream(trackRepository.findAll().spliterator(), false);
     }
 
-    private Album findAlbumOrThrow(String albumId) {
-        return albumRepository.findById(AlbumId.from(albumId))
+    private Album findAlbumOrThrow(AlbumId albumId) {
+        return albumRepository.findById(albumId)
                 .orElseThrow(() -> new AlbumNotFoundException(albumId));
     }
 

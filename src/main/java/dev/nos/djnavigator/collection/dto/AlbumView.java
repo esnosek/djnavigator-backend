@@ -2,6 +2,9 @@ package dev.nos.djnavigator.collection.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.nos.djnavigator.collection.model.id.AlbumId;
+import dev.nos.djnavigator.collection.model.id.AlbumSpotifyId;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -10,30 +13,24 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record AlbumView(
-        String id,
+
+        AlbumId id,
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
         LocalDateTime createdDate,
         String name,
         List<String> artists,
         List<TrackView> tracks,
-        String spotifyId,
+        AlbumSpotifyId spotifyId,
         String imagePath
 ) {
 
-    public AlbumView withTracks(List<TrackView> tracks) {
-        return copy()
-                .tracks(tracks)
-                .build();
+    @JsonProperty("id")
+    public String getId() {
+        return id.id();
     }
 
-    private AlbumView.AlbumViewBuilder copy() {
-        return AlbumView.builder()
-                .id(this.id)
-                .createdDate(this.createdDate)
-                .name(this.name)
-                .artists(this.artists)
-                .spotifyId(this.spotifyId)
-                .tracks(this.tracks)
-                .imagePath(this.imagePath);
+    @JsonProperty("spotifyId")
+    public String getSpotifyAlbumId() {
+        return spotifyId != null ? spotifyId.id() : null;
     }
 }

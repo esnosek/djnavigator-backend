@@ -3,6 +3,7 @@ package dev.nos.djnavigator.spotify.client.request.album;
 import com.fasterxml.jackson.databind.JsonNode;
 import dev.nos.djnavigator.spotify.client.request.SpotifyAuthorizedGetRequest;
 import dev.nos.djnavigator.spotify.model.SpotifyAlbum;
+import dev.nos.djnavigator.spotify.model.id.SpotifyAlbumId;
 
 import java.net.URI;
 import java.util.function.Function;
@@ -13,9 +14,9 @@ public class SpotifyAlbumRequest extends SpotifyAuthorizedGetRequest<SpotifyAlbu
 
     private static final String URI_PATH = "https://api.spotify.com/v1/albums/%s";
 
-    private final String albumId;
+    private final SpotifyAlbumId albumId;
 
-    public SpotifyAlbumRequest(String token, String albumId) {
+    public SpotifyAlbumRequest(String token, SpotifyAlbumId albumId) {
         super(token);
         this.albumId = albumId;
     }

@@ -3,6 +3,7 @@ package dev.nos.djnavigator.spotify.client.request.audiofeatures;
 import com.fasterxml.jackson.databind.JsonNode;
 import dev.nos.djnavigator.spotify.client.request.SpotifyAuthorizedGetRequest;
 import dev.nos.djnavigator.spotify.model.SpotifyTrackAudioFeatures;
+import dev.nos.djnavigator.spotify.model.id.SpotifyTrackId;
 
 import java.net.URI;
 import java.util.function.Function;
@@ -13,9 +14,9 @@ public class SpotifyTrackAudioFeaturesRequest extends SpotifyAuthorizedGetReques
 
     private static final String URI_PATH = "https://api.spotify.com/v1/audio-features/%s";
 
-    private final String trackId;
+    private final SpotifyTrackId trackId;
 
-    public SpotifyTrackAudioFeaturesRequest(String token, String trackId) {
+    public SpotifyTrackAudioFeaturesRequest(String token, SpotifyTrackId trackId) {
         super(token);
         this.trackId = trackId;
     }

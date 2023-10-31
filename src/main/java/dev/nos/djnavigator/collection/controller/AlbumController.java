@@ -6,7 +6,8 @@ import dev.nos.djnavigator.collection.controller.converter.view.AlbumViewConvert
 import dev.nos.djnavigator.collection.controller.exception.AlbumNotFoundException;
 import dev.nos.djnavigator.collection.dto.AlbumCreateDto;
 import dev.nos.djnavigator.collection.dto.AlbumView;
-import dev.nos.djnavigator.collection.model.AlbumId;
+import dev.nos.djnavigator.collection.model.id.AlbumId;
+import dev.nos.djnavigator.collection.model.id.AlbumSpotifyId;
 import dev.nos.djnavigator.collection.repository.AlbumRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,16 +46,16 @@ public class AlbumController {
 
     @PostMapping("/spotify-albums")
     @ResponseStatus(HttpStatus.CREATED)
-    public AlbumView addSpotifyAlbum(@RequestParam(name = "id") String spotifyAlbumId) {
+    public AlbumView addSpotifyAlbum(@RequestParam(name = "id") AlbumSpotifyId albumSpotifyId) {
         final var album = albumRepository.save(
-                albumWithTrackCreator.createAlbumWithTracks(spotifyAlbumId)
+                albumWithTrackCreator.createAlbumWithTracks(albumSpotifyId)
         );
         return AlbumViewConverter.toAlbumView(album, true);
     }
 
     @GetMapping("/albums/{albumId}")
-    public AlbumView getAlbum(@PathVariable String albumId) {
-        final var album = albumRepository.findById(AlbumId.from(albumId))
+    public AlbumView getAlbum(@PathVariable AlbumId albumId) {
+        final var album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new AlbumNotFoundException(albumId));
         return AlbumViewConverter.toAlbumView(album, true);
     }
@@ -67,8 +68,8 @@ public class AlbumController {
     }
 
     @DeleteMapping("/albums/{albumId}")
-    public void deleteAlbum(@PathVariable String albumId) {
-        final var album = albumRepository.findById(AlbumId.from(albumId))
+    public void deleteAlbum(@PathVariable AlbumId albumId) {
+        final var album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new AlbumNotFoundException(albumId));
         albumRepository.deleteById(album.getId());
     }

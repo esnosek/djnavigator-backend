@@ -1,9 +1,12 @@
-package dev.nos.djnavigator.controller
+package dev.nos.djnavigator.collection.controller
 
 import com.fasterxml.jackson.databind.JsonNode
-import dev.nos.djnavigator.collection.model.AlbumId
+import dev.nos.djnavigator.collection.model.id.AlbumId
+import dev.nos.djnavigator.collection.model.id.AlbumSpotifyId
+import dev.nos.djnavigator.collection.model.id.TrackId
 import dev.nos.djnavigator.collection.repository.AlbumRepository
 import dev.nos.djnavigator.collection.repository.TrackRepository
+import dev.nos.djnavigator.spotify.SpotifyMock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -14,13 +17,14 @@ import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 
 import static dev.nos.djnavigator.TestData.*
-import static dev.nos.djnavigator.controller.TestUtils.*
+import static dev.nos.djnavigator.collection.controller.TestUtils.*
 import static java.lang.String.format
 import static java.util.stream.StreamSupport.stream
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.containsString
 import static org.springframework.http.MediaType.APPLICATION_JSON
-import static org.springframework.test.web.client.ExpectedCount.*
+import static org.springframework.test.web.client.ExpectedCount.once
+import static org.springframework.test.web.client.ExpectedCount.twice
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration
@@ -55,7 +59,7 @@ class AlbumControllerSpec extends Specification {
         trackRepository.deleteAll()
     }
 
-    def "should POST /api/albums save album and return album view"() {
+    def "POST /api/albums should save album and return album view"() {
         given:
         def albumCreateDtoJson =
                 '''{   
@@ -90,7 +94,7 @@ class AlbumControllerSpec extends Specification {
         albumRepository.findById(albumId).isPresent()
     }
 
-    def "should POST /api/albums return 400 http code when the request body has unknown field"() {
+    def "POST /api/albums should return 400 http code when the request body has unknown field"() {
         given:
         def albumCreateDtoJson =
                 '''{   
@@ -118,7 +122,7 @@ class AlbumControllerSpec extends Specification {
                 }
     }
 
-    def "should POST /api/albums return 400 http code when the request body does not contain required field"() {
+    def "POST /api/albums should return 400 http code when the request body does not contain required field"() {
         given:
         def albumCreateDtoJson =
                 '''{   
@@ -144,7 +148,7 @@ class AlbumControllerSpec extends Specification {
                 }
     }
 
-    def "should POST /api/spotify-albums save album with all tracks and return album view"() {
+    def "POST /api/spotify-albums should save album with all tracks and return album view"() {
         given:
         def spotifyTrack1 = spotifyTrack().build()
         def spotifyTrack2 = spotifyTrack().build()
@@ -152,12 +156,7 @@ class AlbumControllerSpec extends Specification {
                 .spotifyTracks(List.of(spotifyTrack1, spotifyTrack2))
                 .build()
 
-        def tokenValue = "12341234"
-        def tokenResponse =
-                """{
-                    "access_token": "${tokenValue}",
-                    "expires_in": 3600
-                }"""
+        spotifyMock.mockSpotifyAuthorization()
 
         def spotifyAlbumResponse =
                 """{
@@ -192,6 +191,11 @@ class AlbumControllerSpec extends Specification {
                         ]
                     }
                 }"""
+        spotifyMock.mockGetSpotifyAlbum(
+                twice(),
+                spotifyAlbum.spotifyId(),
+                spotifyAlbumResponse
+        )
 
         def audioFeaturesResponse =
                 """{   
@@ -206,20 +210,8 @@ class AlbumControllerSpec extends Specification {
                     }
                     ]
                 }"""
-
-        spotifyMock.mockSpotifyAuthorization(
-                between(0, 1),
-                tokenResponse
-        )
-        spotifyMock.mockGetSpotifyAlbum(
-                twice(),
-                tokenValue,
-                spotifyAlbum.spotifyId(),
-                spotifyAlbumResponse
-        )
         spotifyMock.mockGetAudioFeatures(
                 once(),
-                tokenValue,
                 List.of(spotifyTrack1.spotifyId(), spotifyTrack2.spotifyId()),
                 audioFeaturesResponse
         )
@@ -283,19 +275,14 @@ class AlbumControllerSpec extends Specification {
         and: "all album tracks are saved"
         stream(albumJson.get("tracks").spliterator(), false)
                 .map { it.get("id").asText() }
-                .forEach { trackRepository.findById(it).isPresent() }
+                .forEach { trackRepository.findById(TrackId.from(it)).isPresent() }
     }
 
-    def "should POST /api/spotify-albums return 404 when spotify album cannot be found"() {
+    def "POST /api/spotify-albums should return 404 when spotify album cannot be found"() {
         given:
         def spotifyAlbumId = spotifyAlbum().build().spotifyId()
 
-        def tokenValue = "12341234"
-        def tokenResponse =
-                """{
-                    "access_token": "${tokenValue}",
-                    "expires_in": 3600
-                }"""
+        spotifyMock.mockSpotifyAuthorization()
 
         def errorResponse =
                 """{
@@ -303,14 +290,8 @@ class AlbumControllerSpec extends Specification {
                         "message" : "Non existing id: 'spotify:album:${spotifyAlbumId}'"
                     }
                 }"""
-
-        spotifyMock.mockSpotifyAuthorization(
-                between(0, 1),
-                tokenResponse
-        )
         spotifyMock.mockNotFoundErrorOnGetSpotifyAlbum(
                 once(),
-                tokenValue,
                 spotifyAlbumId,
                 errorResponse
         )
@@ -338,13 +319,13 @@ class AlbumControllerSpec extends Specification {
                 }
     }
 
-    def "should GET /api/albums/{id} return album"() {
+    def "GET /api/albums/{id} should return album"() {
         given:
         def album = albumRepository.save(album().build())
 
         def expectedResponse =
                 """{   
-                    "id":"${album.getId().id()}",
+                    "id":"${album.getId()}",
                     "createdDate":"${formatDate(album.getCreatedDate())}",
                     "name":"album name",
                     "artists":["artist1","artist2"],
@@ -354,7 +335,7 @@ class AlbumControllerSpec extends Specification {
 
         expect:
         client.get()
-                .uri(format("/api/albums/%s", album.getId().id()))
+                .uri(format("/api/albums/%s", album.getId()))
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -374,16 +355,16 @@ class AlbumControllerSpec extends Specification {
                 .isEqualTo("Album with id 1234 cannot be found in your collection")
     }
 
-    def "should GET /api/albums return all albums from the collection"() {
+    def "GET /api/albums should return all albums from the collection"() {
         given:
         def album1 = albumRepository.save(
                 album()
-                        .spotifyId("spotifyId1")
+                        .spotifyId(AlbumSpotifyId.from("spotifyId1"))
                         .build()
         )
         def album2 = albumRepository.save(
                 album()
-                        .spotifyId("spotifyId2")
+                        .spotifyId(AlbumSpotifyId.from("spotifyId2"))
                         .build()
         )
 
@@ -391,7 +372,7 @@ class AlbumControllerSpec extends Specification {
         def expectedResponse =
                 """[
                     {   
-                        "id":"${album1.getId().id()}",
+                        "id":"${album1.getId()}",
                         "createdDate":"${formatDate(album1.getCreatedDate())}",
                         "name":"album name",
                         "artists":["artist1","artist2"],
@@ -399,7 +380,7 @@ class AlbumControllerSpec extends Specification {
                         "spotifyId":"spotifyId1"
                     },
                     {   
-                        "id":"${album2.getId().id()}",
+                        "id":"${album2.getId()}",
                         "createdDate":"${formatDate(album2.getCreatedDate())}",
                         "name":"album name",
                         "artists":["artist1","artist2"],
@@ -417,13 +398,13 @@ class AlbumControllerSpec extends Specification {
                 .isEqualTo(parsedJson(expectedResponse))
     }
 
-    def "should DELETE /api/albums/{id} delete album from collection"() {
+    def "DELETE /api/albums/{id} should delete album from collection"() {
         given:
         def album = albumRepository.save(album().build())
 
         expect:
         client.delete()
-                .uri(format("/api/albums/%s", album.getId().id()))
+                .uri(format("/api/albums/%s", album.getId()))
                 .exchange()
                 .expectStatus()
                 .isOk()
@@ -432,7 +413,7 @@ class AlbumControllerSpec extends Specification {
         albumRepository.findById(album.id).isEmpty()
     }
 
-    def "should DELETE /api/albums/{id} return 404 http code when album cannot be found in the collection"() {
+    def "DELETE /api/albums/{id} should return 404 http code when album cannot be found in the collection"() {
         expect:
         client.delete()
                 .uri("/api/albums/1234")

@@ -32,7 +32,7 @@ public class AlbumViewConverter {
 
     private static AlbumView.AlbumViewBuilder albumViewBuilder(Album album) {
         return AlbumView.builder()
-                .id(album.getId().id())
+                .id(album.getId())
                 .createdDate(album.getCreatedDate())
                 .name(album.getName())
                 .artists(album.getArtists())

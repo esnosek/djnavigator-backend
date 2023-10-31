@@ -1,4 +1,4 @@
-package dev.nos.djnavigator.collection.model;
+package dev.nos.djnavigator.collection.model.id;
 
 import jakarta.persistence.Embeddable;
 

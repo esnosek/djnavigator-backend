@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import dev.nos.djnavigator.spotify.client.request.album.SpotifyAlbumConverter;
 import dev.nos.djnavigator.spotify.model.SpotifyAlbum;
 import dev.nos.djnavigator.spotify.model.SpotifyTrack;
+import dev.nos.djnavigator.spotify.model.id.SpotifyTrackId;
 
 import java.util.List;
 import java.util.function.Function;
@@ -17,7 +18,7 @@ public class SpotifyTrackConverter implements Function<JsonNode, SpotifyTrack> {
     @Override
     public SpotifyTrack apply(JsonNode track) {
         return SpotifyTrack.builder()
-                .spotifyId(track.get("id").asText())
+                .spotifyId(SpotifyTrackId.from(track.get("id").asText()))
                 .name(track.get("name").asText())
                 .artists(artists(track))
                 .imagePath(imagePathIfProvided(track))

@@ -1,6 +1,6 @@
-package dev.nos.djnavigator.repository
+package dev.nos.djnavigator.collection.repository
 
-import dev.nos.djnavigator.collection.repository.AlbumRepository
+import dev.nos.djnavigator.collection.model.id.AlbumSpotifyId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -27,17 +27,17 @@ class AlbumRepositorySpec extends Specification {
         given:
         def album1 = albumRepository.save(
                 album()
-                        .spotifyId("spotifyId1")
+                        .spotifyId(AlbumSpotifyId.from("spotifyId1"))
                         .build()
         )
         albumRepository.save(
                 album()
-                        .spotifyId("spotifyId2")
+                        .spotifyId(AlbumSpotifyId.from("spotifyId2"))
                         .build()
         )
 
         when:
-        def album = albumRepository.findBySpotifyId("spotifyId1")
+        def album = albumRepository.findBySpotifyId(AlbumSpotifyId.from("spotifyId1"))
 
         then:
         album.get() == album1
@@ -48,12 +48,12 @@ class AlbumRepositorySpec extends Specification {
         given:
         albumRepository.save(
                 album()
-                        .spotifyId("spotifyId")
+                        .spotifyId(AlbumSpotifyId.from("spotifyId"))
                         .build()
         )
 
         when:
-        def album = albumRepository.findBySpotifyId("xxx")
+        def album = albumRepository.findBySpotifyId(AlbumSpotifyId.from("xxx"))
 
         then:
         album.isEmpty()

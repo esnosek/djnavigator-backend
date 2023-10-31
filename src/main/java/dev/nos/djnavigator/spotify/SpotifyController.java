@@ -5,6 +5,9 @@ import dev.nos.djnavigator.spotify.model.SpotifyAlbum;
 import dev.nos.djnavigator.spotify.model.SpotifyPlaylist;
 import dev.nos.djnavigator.spotify.model.SpotifySearchResults;
 import dev.nos.djnavigator.spotify.model.SpotifyTrack;
+import dev.nos.djnavigator.spotify.model.id.SpotifyAlbumId;
+import dev.nos.djnavigator.spotify.model.id.SpotifyPlaylistId;
+import dev.nos.djnavigator.spotify.model.id.SpotifyTrackId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,17 +28,17 @@ class SpotifyController {
     }
 
     @GetMapping("/tracks/{spotifyTrackId}")
-    public SpotifyTrack getSpotifyTrack(@PathVariable String spotifyTrackId) {
+    public SpotifyTrack getSpotifyTrack(@PathVariable SpotifyTrackId spotifyTrackId) {
         return spotifyQueries.trackWithAudioFeature(spotifyTrackId);
     }
 
     @GetMapping("/albums/{albumId}")
-    public SpotifyAlbum getSpotifyAlbum(@PathVariable String albumId) {
+    public SpotifyAlbum getSpotifyAlbum(@PathVariable SpotifyAlbumId albumId) {
         return spotifyQueries.albumWithTracksAndAudioFeatures(albumId);
     }
 
     @GetMapping("/playlists/{playlistId}")
-    public SpotifyPlaylist getSpotifyPlaylist(@PathVariable String playlistId) {
+    public SpotifyPlaylist getSpotifyPlaylist(@PathVariable SpotifyPlaylistId playlistId) {
         return spotifyQueries.playlist(playlistId);
     }
 }

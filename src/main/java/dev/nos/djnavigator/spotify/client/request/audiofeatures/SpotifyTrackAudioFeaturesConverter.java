@@ -2,6 +2,7 @@ package dev.nos.djnavigator.spotify.client.request.audiofeatures;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import dev.nos.djnavigator.spotify.model.SpotifyTrackAudioFeatures;
+import dev.nos.djnavigator.spotify.model.id.SpotifyTrackId;
 
 import java.math.BigDecimal;
 import java.util.function.Function;
@@ -13,7 +14,7 @@ public class SpotifyTrackAudioFeaturesConverter implements Function<JsonNode, Sp
     @Override
     public SpotifyTrackAudioFeatures apply(JsonNode audioFeatures) {
         return SpotifyTrackAudioFeatures.builder()
-                .id(audioFeatures.get("id").asText())
+                .id(SpotifyTrackId.from(audioFeatures.get("id").asText()))
                 .tempo(roundTempo(audioFeatures))
                 .build();
     }

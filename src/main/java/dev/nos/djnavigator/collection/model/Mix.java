@@ -1,5 +1,6 @@
 package dev.nos.djnavigator.collection.model;
 
+import dev.nos.djnavigator.collection.model.id.MixId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+
+import static java.time.LocalDateTime.now;
+import static java.time.temporal.ChronoUnit.MILLIS;
 
 @Entity
 @Builder
@@ -34,10 +38,16 @@ import java.time.LocalDateTime;
         )
 })
 public class Mix {
-    @Id
-    private String id;
+
+    @EmbeddedId
+    @AttributeOverride(name = "idValue", column = @Column(name = "id"))
+    @Builder.Default
+    private MixId id = MixId.randomId();
+
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdDate;
+    @Builder.Default
+    private LocalDateTime createdDate = now().truncatedTo(MILLIS);
+
     private Turntable leftTurntable;
     private Turntable rightTurntable;
 }

@@ -1,7 +1,7 @@
 package dev.nos.djnavigator.collection.repository;
 
 import dev.nos.djnavigator.collection.model.Album;
-import dev.nos.djnavigator.collection.model.AlbumId;
+import dev.nos.djnavigator.collection.model.id.AlbumId;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

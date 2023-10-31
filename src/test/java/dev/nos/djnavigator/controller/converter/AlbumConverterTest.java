@@ -1,6 +1,7 @@
 package dev.nos.djnavigator.controller.converter;
 
 import dev.nos.djnavigator.collection.controller.converter.model.AlbumConverter;
+import dev.nos.djnavigator.collection.controller.converter.model.ConvertersUtils;
 import dev.nos.djnavigator.collection.model.Album;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +48,7 @@ class AlbumConverterTest {
                 .returns(spotifyAlbum.artists(), from(Album::getArtists))
                 .returns(spotifyAlbum.name(), from(Album::getName))
                 .returns(List.of(), from(Album::getTracks))
-                .returns(spotifyAlbum.spotifyId(), from(Album::getSpotifyId));
+                .returns(ConvertersUtils.toAlbumSpotifyId(spotifyAlbum.spotifyId()), from(Album::getSpotifyId));
     }
 
 }

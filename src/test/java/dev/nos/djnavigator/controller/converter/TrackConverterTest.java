@@ -5,6 +5,7 @@ import dev.nos.djnavigator.collection.model.Track;
 import org.junit.jupiter.api.Test;
 
 import static dev.nos.djnavigator.TestData.*;
+import static dev.nos.djnavigator.collection.controller.converter.model.ConvertersUtils.toTrackSpotifyId;
 import static java.util.Optional.empty;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.from;
@@ -67,6 +68,6 @@ class TrackConverterTest {
                 .returns(spotifyTrack.artists(), from(Track::getArtists))
                 .returns(album, from(Track::getAlbum))
                 .returns(spotifyTrack.audioFeatures().tempo(), from(Track::getTempo))
-                .returns(spotifyTrack.spotifyId(), from(Track::getSpotifyId));
+                .returns(toTrackSpotifyId(spotifyTrack.spotifyId()), from(Track::getSpotifyId));
     }
 }

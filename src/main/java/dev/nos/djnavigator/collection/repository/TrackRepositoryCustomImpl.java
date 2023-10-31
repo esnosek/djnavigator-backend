@@ -1,7 +1,8 @@
 package dev.nos.djnavigator.collection.repository;
 
-import dev.nos.djnavigator.collection.model.AlbumId;
 import dev.nos.djnavigator.collection.model.Track;
+import dev.nos.djnavigator.collection.model.id.AlbumId;
+import dev.nos.djnavigator.collection.model.id.TrackSpotifyId;
 import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class TrackRepositoryCustomImpl implements TrackRepositoryCustom {
 
 
     @Override
-    public Track findBySpotifyId(String spotifyId) {
+    public Track findBySpotifyId(TrackSpotifyId spotifyId) {
         final var session = entityManager.unwrap(Session.class);
         return session.createQuery("from Track t where t.spotifyId = :spotifyId", Track.class)
                 .setParameter("spotifyId", spotifyId)

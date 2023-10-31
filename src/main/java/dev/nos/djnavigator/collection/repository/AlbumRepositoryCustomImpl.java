@@ -1,6 +1,7 @@
 package dev.nos.djnavigator.collection.repository;
 
 import dev.nos.djnavigator.collection.model.Album;
+import dev.nos.djnavigator.collection.model.id.AlbumSpotifyId;
 import jakarta.persistence.EntityManager;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class AlbumRepositoryCustomImpl implements AlbumRepositoryCustom {
     }
 
     @Override
-    public Optional<Album> findBySpotifyId(String spotifyId) {
+    public Optional<Album> findBySpotifyId(AlbumSpotifyId spotifyId) {
         final var session = entityManager.unwrap(Session.class);
         return session.createQuery("from Album a where a.spotifyId = :spotifyId", Album.class)
                 .setParameter("spotifyId", spotifyId)

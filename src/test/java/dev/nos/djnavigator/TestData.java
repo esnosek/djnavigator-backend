@@ -4,41 +4,41 @@ import dev.nos.djnavigator.collection.dto.AlbumCreateDto;
 import dev.nos.djnavigator.collection.dto.TrackCreateDto;
 import dev.nos.djnavigator.collection.model.Album;
 import dev.nos.djnavigator.collection.model.Track;
+import dev.nos.djnavigator.collection.model.id.AlbumId;
+import dev.nos.djnavigator.collection.model.id.AlbumSpotifyId;
+import dev.nos.djnavigator.collection.model.id.TrackSpotifyId;
 import dev.nos.djnavigator.spotify.model.SpotifyAlbum;
 import dev.nos.djnavigator.spotify.model.SpotifyTrack;
 import dev.nos.djnavigator.spotify.model.SpotifyTrackAudioFeatures;
-import org.unbrokendome.base62.Base62;
+import dev.nos.djnavigator.spotify.model.id.SpotifyAlbumId;
+import dev.nos.djnavigator.spotify.model.id.SpotifyTrackId;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.Optional.of;
-import static java.util.UUID.randomUUID;
 
 public class TestData {
 
     public static Track.TrackBuilder track() {
         return Track.builder()
-                .id(Base62.encodeUUID(randomUUID()))
-                .createdDate(LocalDateTime.now())
                 .name("track name")
                 .artists(List.of("artist1", "artist2"))
                 .tempo(new BigDecimal("123.123"))
-                .spotifyId("spotifyId");
+                .spotifyId(TrackSpotifyId.from("spotifyId"));
     }
 
     public static Album.AlbumBuilder album() {
         return Album.builder()
                 .name("album name")
                 .artists(List.of("artist1", "artist2"))
-                .spotifyId("spotifyId");
+                .spotifyId(AlbumSpotifyId.from("spotifyId"));
     }
 
 
     public static SpotifyTrack.SpotifyTrackBuilder spotifyTrack() {
         return SpotifyTrack.builder()
-                .spotifyId(Base62.encodeUUID(randomUUID()))
+                .spotifyId(SpotifyTrackId.randomId())
                 .name("spotify track name")
                 .artists(List.of("artist1", "artist2"))
                 .audioFeatures(spotifyTrackAudioFeatures().build())
@@ -52,7 +52,7 @@ public class TestData {
 
     public static SpotifyAlbum.SpotifyAlbumBuilder spotifyAlbum() {
         return SpotifyAlbum.builder()
-                .spotifyId(Base62.encodeUUID(randomUUID()))
+                .spotifyId(SpotifyAlbumId.randomId())
                 .name("spotify album name")
                 .artists(List.of("artist1", "artist2"))
                 .spotifyTracks(List.of());
@@ -62,7 +62,7 @@ public class TestData {
         return TrackCreateDto.builder()
                 .name("track name")
                 .artists(List.of("artist1", "artist2"))
-                .albumId("albumId")
+                .albumId(AlbumId.from("albumId"))
                 .tempo(of(new BigDecimal("134.134")));
     }
 

@@ -7,6 +7,9 @@ import dev.nos.djnavigator.spotify.client.request.playlist.SpotifyPlaylistReques
 import dev.nos.djnavigator.spotify.client.request.search.SearchAlbumOrTrackRequest;
 import dev.nos.djnavigator.spotify.client.request.track.SpotifyTrackRequest;
 import dev.nos.djnavigator.spotify.model.*;
+import dev.nos.djnavigator.spotify.model.id.SpotifyAlbumId;
+import dev.nos.djnavigator.spotify.model.id.SpotifyPlaylistId;
+import dev.nos.djnavigator.spotify.model.id.SpotifyTrackId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,27 +34,27 @@ class SpotifyApi {
                 .execute(httpManager);
     }
 
-    SpotifyAlbum album(String albumId) {
+    SpotifyAlbum album(SpotifyAlbumId albumId) {
         return new SpotifyAlbumRequest(accessToken(), albumId)
                 .execute(httpManager);
     }
 
-    SpotifyTrack track(String trackId) {
+    SpotifyTrack track(SpotifyTrackId trackId) {
         return new SpotifyTrackRequest(accessToken(), trackId)
                 .execute(httpManager);
     }
 
-    SpotifyPlaylist playlist(String playlistId) {
+    SpotifyPlaylist playlist(SpotifyPlaylistId playlistId) {
         return new SpotifyPlaylistRequest(accessToken(), playlistId)
                 .execute(httpManager);
     }
 
-    SpotifyTrackAudioFeatures audioFeatures(String trackId) {
+    SpotifyTrackAudioFeatures audioFeatures(SpotifyTrackId trackId) {
         return new SpotifyTrackAudioFeaturesRequest(accessToken(), trackId)
                 .execute(httpManager);
     }
 
-    Map<String, SpotifyTrackAudioFeatures> audioFeatures(List<String> tracksIds) {
+    Map<SpotifyTrackId, SpotifyTrackAudioFeatures> audioFeatures(List<SpotifyTrackId> tracksIds) {
         return new SpotifyTracksAudioFeaturesRequest(accessToken(), tracksIds)
                 .execute(httpManager);
     }

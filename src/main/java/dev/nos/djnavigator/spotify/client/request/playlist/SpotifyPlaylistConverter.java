@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import dev.nos.djnavigator.spotify.client.request.track.SpotifyTrackConverter;
 import dev.nos.djnavigator.spotify.model.SpotifyPlaylist;
 import dev.nos.djnavigator.spotify.model.SpotifyTrack;
+import dev.nos.djnavigator.spotify.model.id.SpotifyPlaylistId;
 
 import java.util.List;
 import java.util.function.Function;
@@ -16,7 +17,7 @@ public class SpotifyPlaylistConverter implements Function<JsonNode, SpotifyPlayl
     @Override
     public SpotifyPlaylist apply(JsonNode playlist) {
         return SpotifyPlaylist.builder()
-                .id(playlist.get("id").asText())
+                .spotifyId(SpotifyPlaylistId.from(playlist.get("id").asText()))
                 .tracks(spotifyTracks(playlist.get("tracks")))
                 .build();
     }

@@ -2,13 +2,11 @@ package dev.nos.djnavigator.collection.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import dev.nos.djnavigator.collection.controller.converter.model.MixConverter;
-import dev.nos.djnavigator.collection.controller.converter.model.MixPitchCalculator;
 import dev.nos.djnavigator.collection.controller.converter.view.MixViewConverter;
 import dev.nos.djnavigator.collection.controller.exception.TrackNotFoundException;
 import dev.nos.djnavigator.collection.dto.MixCreateDto;
 import dev.nos.djnavigator.collection.dto.MixView;
-import dev.nos.djnavigator.collection.model.AlbumId;
-import dev.nos.djnavigator.collection.model.Track;
+import dev.nos.djnavigator.collection.model.id.TrackId;
 import dev.nos.djnavigator.collection.repository.AlbumRepository;
 import dev.nos.djnavigator.collection.repository.MixRepository;
 import dev.nos.djnavigator.collection.repository.TrackRepository;
@@ -18,9 +16,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
-import static java.util.stream.Collectors.toMap;
+import static dev.nos.djnavigator.collection.controller.converter.model.MixPitchCalculator.calculatePitch;
 
 @RestController
 @RequestMapping("/api")
@@ -42,33 +39,16 @@ public class MixController {
         this.albumRepository = albumRepository;
     }
 
-    @GetMapping("/mixes")
-    public Map<String, BigDecimal> getMixFor(@RequestParam(name = "staticTrackId") String staticTrackId,
-                                             @RequestParam(name = "albumId") String albumId) {
-        final var staticTrack = trackRepository.findById(staticTrackId)
-                .orElseThrow(() -> new TrackNotFoundException(staticTrackId));
-        return albumRepository.findById(AlbumId.from(albumId))
-                .orElseThrow()
-                .getTracks()
-                .stream()
-                .collect(
-                        toMap(
-                                Track::getId,
-                                track -> MixPitchCalculator.calculatePitch(staticTrack, track)
-                        )
-                );
-    }
-
     @GetMapping("/mix")
-    public MixResponse getMix(@RequestParam(name = "staticTrackId") String staticTrackId,
-                              @RequestParam(name = "dynamicTrackId") String dynamicTrackId) {
+    public MixResponse getMix(@RequestParam(name = "staticTrackId") TrackId staticTrackId,
+                              @RequestParam(name = "dynamicTrackId") TrackId dynamicTrackId) {
         final var staticTrack = trackRepository.findById(staticTrackId)
                 .orElseThrow(() -> new TrackNotFoundException(staticTrackId));
         final var dynamicTrack = trackRepository.findById(dynamicTrackId)
                 .orElseThrow(() -> new TrackNotFoundException(dynamicTrackId));
 
         return MixResponse.builder()
-                .val(MixPitchCalculator.calculatePitch(staticTrack, dynamicTrack))
+                .val(calculatePitch(staticTrack, dynamicTrack))
                 .build();
     }
 

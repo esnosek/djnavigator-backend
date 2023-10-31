@@ -3,6 +3,7 @@ package dev.nos.djnavigator.spotify.client.request.track;
 import com.fasterxml.jackson.databind.JsonNode;
 import dev.nos.djnavigator.spotify.client.request.SpotifyAuthorizedGetRequest;
 import dev.nos.djnavigator.spotify.model.SpotifyTrack;
+import dev.nos.djnavigator.spotify.model.id.SpotifyTrackId;
 
 import java.net.URI;
 import java.util.function.Function;
@@ -13,9 +14,9 @@ public class SpotifyTrackRequest extends SpotifyAuthorizedGetRequest<SpotifyTrac
 
     private static final String URI_PATH = "https://api.spotify.com/v1/tracks/%s";
 
-    private final String trackId;
+    private final SpotifyTrackId trackId;
 
-    public SpotifyTrackRequest(String token, String trackId) {
+    public SpotifyTrackRequest(String token, SpotifyTrackId trackId) {
         super(token);
         this.trackId = trackId;
     }

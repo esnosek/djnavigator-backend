@@ -1,6 +1,8 @@
 package dev.nos.djnavigator.spotify.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.nos.djnavigator.spotify.model.id.SpotifyAlbumId;
 import lombok.Builder;
 
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record SpotifyAlbum(
-        String spotifyId,
+        SpotifyAlbumId spotifyId,
         String name,
         List<String> artists,
         List<SpotifyTrack> spotifyTracks,
@@ -27,5 +29,10 @@ public record SpotifyAlbum(
                 .artists(this.artists)
                 .spotifyTracks(this.spotifyTracks)
                 .imagePath(this.imagePath);
+    }
+
+    @JsonProperty("spotifyId")
+    public String getSpotifyAlbumId() {
+        return spotifyId != null ? spotifyId.id() : null;
     }
 }

@@ -3,6 +3,7 @@ package dev.nos.djnavigator.spotify.client.request.playlist;
 import com.fasterxml.jackson.databind.JsonNode;
 import dev.nos.djnavigator.spotify.client.request.SpotifyAuthorizedGetRequest;
 import dev.nos.djnavigator.spotify.model.SpotifyPlaylist;
+import dev.nos.djnavigator.spotify.model.id.SpotifyPlaylistId;
 
 import java.net.URI;
 import java.util.function.Function;
@@ -13,9 +14,9 @@ public class SpotifyPlaylistRequest extends SpotifyAuthorizedGetRequest<SpotifyP
 
     private static final String URI_PATH = "https://api.spotify.com/v1/playlists/%s";
 
-    private final String playlistId;
+    private final SpotifyPlaylistId playlistId;
 
-    public SpotifyPlaylistRequest(String token, String playlistId) {
+    public SpotifyPlaylistRequest(String token, SpotifyPlaylistId playlistId) {
         super(token);
         this.playlistId = playlistId;
     }

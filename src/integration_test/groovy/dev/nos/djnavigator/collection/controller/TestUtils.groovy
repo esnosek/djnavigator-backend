@@ -1,4 +1,4 @@
-package dev.nos.djnavigator.controller
+package dev.nos.djnavigator.collection.controller
 
 
 import groovy.json.JsonSlurper
