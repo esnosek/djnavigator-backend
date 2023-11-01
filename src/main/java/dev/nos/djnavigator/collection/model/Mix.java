@@ -2,21 +2,16 @@ package dev.nos.djnavigator.collection.model;
 
 import dev.nos.djnavigator.collection.model.id.MixId;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
-
-import static java.time.LocalDateTime.now;
-import static java.time.temporal.ChronoUnit.MILLIS;
 
 @Entity
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @AttributeOverrides({
         @AttributeOverride(
                 name = "leftTurntable.pitch",
@@ -45,8 +40,7 @@ public class Mix {
     private MixId id = MixId.randomId();
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Builder.Default
-    private LocalDateTime createdDate = now().truncatedTo(MILLIS);
+    private LocalDateTime createdDate;
 
     private Turntable leftTurntable;
     private Turntable rightTurntable;

@@ -5,16 +5,23 @@ import dev.nos.djnavigator.collection.dto.MixCreateDto;
 import dev.nos.djnavigator.collection.model.Mix;
 import dev.nos.djnavigator.collection.model.Turntable;
 import dev.nos.djnavigator.collection.repository.TrackRepository;
+import dev.nos.djnavigator.time.Clock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
+import static java.time.temporal.ChronoUnit.MILLIS;
+
 @Service
 public class MixConverter {
 
+    public final Clock clock;
     private final TrackRepository trackRepository;
 
-    public MixConverter(TrackRepository trackRepository) {
+    @Autowired
+    public MixConverter(Clock clock, TrackRepository trackRepository) {
+        this.clock = clock;
         this.trackRepository = trackRepository;
     }
 
@@ -26,6 +33,7 @@ public class MixConverter {
                 .orElseThrow(() -> new TrackNotFoundException(mixCreateDto.rightTrackId()));
 
         return Mix.builder()
+                .createdDate(clock.now().truncatedTo(MILLIS))
                 .leftTurntable(
                         Turntable.builder()
                                 .track(leftTrack)

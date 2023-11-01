@@ -14,14 +14,24 @@ import dev.nos.djnavigator.spotify.model.id.SpotifyAlbumId;
 import dev.nos.djnavigator.spotify.model.id.SpotifyTrackId;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.util.Optional.of;
 
 public class TestData {
 
+    public static Clock CLOCK = Clock.systemDefaultZone();
+
+    public static void setClock(Clock clock) {
+        TestData.CLOCK = clock;
+    }
+
     public static Track.TrackBuilder track() {
         return Track.builder()
+                .createdDate(LocalDateTime.now(CLOCK).truncatedTo(MILLIS))
                 .name("track name")
                 .artists(List.of("artist1", "artist2"))
                 .tempo(new BigDecimal("123.123"))
@@ -30,6 +40,7 @@ public class TestData {
 
     public static Album.AlbumBuilder album() {
         return Album.builder()
+                .createdDate(LocalDateTime.now(CLOCK).truncatedTo(MILLIS))
                 .name("album name")
                 .artists(List.of("artist1", "artist2"))
                 .spotifyId(AlbumSpotifyId.from("spotifyId"));

@@ -6,7 +6,9 @@ import dev.nos.djnavigator.collection.model.id.AlbumSpotifyId
 import dev.nos.djnavigator.collection.model.id.TrackId
 import dev.nos.djnavigator.collection.repository.AlbumRepository
 import dev.nos.djnavigator.collection.repository.TrackRepository
+import dev.nos.djnavigator.config.TestConfig
 import dev.nos.djnavigator.spotify.SpotifyMock
+import dev.nos.djnavigator.time.Clock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -15,6 +17,8 @@ import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
+
+import java.time.Instant
 
 import static dev.nos.djnavigator.TestData.*
 import static dev.nos.djnavigator.collection.controller.TestUtils.*
@@ -26,7 +30,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.test.web.client.ExpectedCount.once
 import static org.springframework.test.web.client.ExpectedCount.twice
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = TestConfig.class
+)
 @ContextConfiguration
 @ActiveProfiles("test")
 class AlbumControllerSpec extends Specification {
@@ -43,6 +50,9 @@ class AlbumControllerSpec extends Specification {
     @Autowired
     private RestTemplate restTemplate
 
+    @Autowired
+    private Clock clock
+
     private MockRestServiceServer mockServer
     private SpotifyMock spotifyMock
 
@@ -52,6 +62,7 @@ class AlbumControllerSpec extends Specification {
                 .ignoreExpectOrder(true)
                 .build()
         spotifyMock = new SpotifyMock(mockServer)
+        clock.setFixed(Instant.parse("2018-08-19T16:02:42.00Z"))
     }
 
     void cleanup() {

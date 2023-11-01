@@ -13,10 +13,10 @@ class AlbumViewConverterTest {
     @Test
     void should_ToAlbumView_Album_ReturnAlbumView() {
         // given
-        final var album = album().build();
+        var album = album().build();
 
         // when
-        final var albumView = toAlbumView(album, false);
+        var albumView = toAlbumView(album, false);
 
         // then
         assertThat(albumView)

@@ -4,23 +4,18 @@ import dev.nos.djnavigator.collection.model.converter.StringListConverter;
 import dev.nos.djnavigator.collection.model.id.TrackId;
 import dev.nos.djnavigator.collection.model.id.TrackSpotifyId;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static java.time.LocalDateTime.now;
-import static java.time.temporal.ChronoUnit.MILLIS;
 
 @Entity
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Track {
 
     @EmbeddedId
@@ -29,8 +24,7 @@ public class Track {
     private TrackId id = TrackId.randomId();
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Builder.Default
-    private LocalDateTime createdDate = now().truncatedTo(MILLIS);
+    private LocalDateTime createdDate;
 
     private String name;
 

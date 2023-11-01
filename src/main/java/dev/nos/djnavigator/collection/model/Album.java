@@ -4,24 +4,19 @@ import dev.nos.djnavigator.collection.model.converter.StringListConverter;
 import dev.nos.djnavigator.collection.model.id.AlbumId;
 import dev.nos.djnavigator.collection.model.id.AlbumSpotifyId;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static java.time.LocalDateTime.now;
-import static java.time.temporal.ChronoUnit.MILLIS;
-
 @Entity
 @Builder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class Album {
 
     @EmbeddedId
@@ -30,8 +25,7 @@ public class Album {
     private AlbumId id = AlbumId.randomId();
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Builder.Default
-    private LocalDateTime createdDate = now().truncatedTo(MILLIS);
+    private LocalDateTime createdDate;
 
     private String name;
 

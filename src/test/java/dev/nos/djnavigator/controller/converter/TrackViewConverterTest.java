@@ -12,13 +12,13 @@ class TrackViewConverterTest {
 
     @Test
     void should_ToTrackView_Track_ReturnTrackView() {
-        //given
-        final var track = track().build();
+        // given
+        var track = track().build();
 
-        //when
-        final var trackView = toTrackView(track, false);
+        // when
+        var trackView = toTrackView(track, false);
 
-        //then
+        // then
         assertThat(trackView)
                 .isNotNull()
                 .returns(track.getId(), from(TrackView::id))
@@ -32,15 +32,15 @@ class TrackViewConverterTest {
 
     @Test
     void should_ToTrackView_Track_ReturnTrackView_WhenOptionalValuesNotProvided() {
-        //given
-        final var track = track()
+        // given
+        var track = track()
                 .spotifyId(null)
                 .build();
 
-        //when
-        final var trackView = toTrackView(track, false);
+        // when
+        var trackView = toTrackView(track, false);
 
-        //then
+        // then
         assertThat(trackView)
                 .isNotNull()
                 .returns(null, from(TrackView::spotifyId));

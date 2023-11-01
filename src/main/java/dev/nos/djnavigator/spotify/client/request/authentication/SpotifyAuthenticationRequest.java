@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import dev.nos.djnavigator.spotify.client.OAuthToken;
 import dev.nos.djnavigator.spotify.client.SpotifyClientCredentials;
 import dev.nos.djnavigator.spotify.client.request.SpotifyPostRequest;
+import dev.nos.djnavigator.time.Clock;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.LinkedMultiValueMap;
 
@@ -12,7 +13,6 @@ import java.util.Date;
 import java.util.function.Function;
 
 import static java.nio.charset.StandardCharsets.US_ASCII;
-import static java.time.Instant.now;
 import static org.apache.tomcat.util.codec.binary.Base64.encodeBase64;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
@@ -20,9 +20,11 @@ public class SpotifyAuthenticationRequest extends SpotifyPostRequest<OAuthToken>
 
     private final static String URI_PATH = "https://accounts.spotify.com/api/token";
 
+    private final Clock clock;
     private final SpotifyClientCredentials credentials;
 
-    public SpotifyAuthenticationRequest(SpotifyClientCredentials credentials) {
+    public SpotifyAuthenticationRequest(Clock clock, SpotifyClientCredentials credentials) {
+        this.clock = clock;
         this.credentials = credentials;
     }
 
@@ -33,7 +35,7 @@ public class SpotifyAuthenticationRequest extends SpotifyPostRequest<OAuthToken>
             final var expiresIn = jsonNode.get("expires_in").asLong();
             return new OAuthToken(
                     accessToken,
-                    Date.from(now().plusSeconds(expiresIn))
+                    Date.from(clock.instant().plusSeconds(expiresIn))
             );
         };
     }
