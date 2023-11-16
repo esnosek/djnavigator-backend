@@ -1,101 +1,70 @@
 package dev.nos.djnavigator.collection.controller;
 
-import dev.nos.djnavigator.collection.controller.converter.model.AlbumWithTrackCreator;
-import dev.nos.djnavigator.collection.controller.converter.model.TrackConverter;
-import dev.nos.djnavigator.collection.controller.exception.AlbumNotFoundException;
-import dev.nos.djnavigator.collection.controller.exception.TrackNotFoundException;
 import dev.nos.djnavigator.collection.dto.TrackCreateDto;
 import dev.nos.djnavigator.collection.dto.TrackView;
-import dev.nos.djnavigator.collection.model.Album;
-import dev.nos.djnavigator.collection.model.Track;
 import dev.nos.djnavigator.collection.model.id.AlbumId;
 import dev.nos.djnavigator.collection.model.id.TrackId;
 import dev.nos.djnavigator.collection.model.id.TrackSpotifyId;
-import dev.nos.djnavigator.collection.repository.AlbumRepository;
-import dev.nos.djnavigator.collection.repository.TrackRepository;
+import dev.nos.djnavigator.collection.repository.TrackQueries;
+import dev.nos.djnavigator.collection.repository.TrackService;
+import dev.nos.djnavigator.collection.service.TrackFromSpotifyCreator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Stream;
 
-import static dev.nos.djnavigator.collection.controller.converter.view.TrackViewConverter.toTrackView;
-import static java.util.stream.StreamSupport.stream;
+import static dev.nos.djnavigator.collection.dto.converter.TrackViewConverter.trackView;
 
 @RestController
 @RequestMapping("/api")
 public class TrackController {
 
-    private final TrackRepository trackRepository;
-    private final AlbumRepository albumRepository;
-    private final TrackConverter trackConverter;
-    private final AlbumWithTrackCreator albumWithTrackCreator;
+    private final TrackService trackService;
+    private final TrackQueries trackQueries;
+    private final TrackFromSpotifyCreator trackFromSpotifyCreator;
 
     @Autowired
-    public TrackController(TrackRepository trackRepository,
-                           AlbumRepository albumRepository,
-                           TrackConverter trackConverter,
-                           AlbumWithTrackCreator albumWithTrackCreator) {
-        this.trackRepository = trackRepository;
-        this.albumRepository = albumRepository;
-        this.trackConverter = trackConverter;
-        this.albumWithTrackCreator = albumWithTrackCreator;
+    public TrackController(TrackService trackService,
+                           TrackQueries trackQueries,
+                           TrackFromSpotifyCreator TrackFromSpotifyCreator) {
+        this.trackService = trackService;
+        this.trackQueries = trackQueries;
+        this.trackFromSpotifyCreator = TrackFromSpotifyCreator;
     }
 
     @PostMapping("/tracks")
+    @ResponseStatus(HttpStatus.CREATED)
     public TrackView addTrack(@RequestBody @Validated TrackCreateDto trackCreateDto) {
-        final var album = findAlbumOrThrow(trackCreateDto.albumId());
-        final var track = trackRepository.save(
-                trackConverter.createTrack(trackCreateDto, album)
-        );
-        return toTrackView(track, true);
+        final var track = trackService.save(trackCreateDto);
+        return trackView(track, true);
     }
 
     @PostMapping("/spotify-tracks")
+    @ResponseStatus(HttpStatus.CREATED)
     public TrackView addSpotifyTrack(@RequestParam(name = "id") TrackSpotifyId trackSpotifyId) {
-        albumRepository.save(
-                albumWithTrackCreator.createAlbumWithTrack(trackSpotifyId)
-        );
-        final var track = trackRepository.findBySpotifyId(trackSpotifyId);
-        return toTrackView(track, true);
+        final var track = trackFromSpotifyCreator.saveTrackWithAlbum(trackSpotifyId);
+        return trackView(track, true);
     }
 
     @GetMapping("/tracks/{trackId}")
     public TrackView getTrack(@PathVariable TrackId trackId) {
-        final var track = trackRepository.findById(trackId)
-                .orElseThrow(() -> new TrackNotFoundException(trackId));
-        return toTrackView(track, true);
+        final var track = trackQueries.getById(trackId);
+        return trackView(track, true);
     }
 
     @GetMapping("tracks")
     public List<TrackView> getTracks(@RequestParam(required = false) AlbumId albumId) {
-        final var tracks = null == albumId
-                ? allTracks()
-                : albumTracks(albumId);
-        return tracks
-                .map(track -> toTrackView(track, true))
+        return trackQueries.findByAlbumId(albumId)
+                .stream()
+                .map(track -> trackView(track, true))
                 .toList();
     }
 
     @DeleteMapping("/tracks/{trackId}")
     public void deleteTrack(@PathVariable TrackId trackId) {
-        trackRepository.deleteById(trackId);
-    }
-
-    private Stream<Track> albumTracks(AlbumId albumId) {
-        final var album = findAlbumOrThrow(albumId);
-        return trackRepository.findByAlbumId(album.getId())
-                .stream();
-    }
-
-    private Stream<Track> allTracks() {
-        return stream(trackRepository.findAll().spliterator(), false);
-    }
-
-    private Album findAlbumOrThrow(AlbumId albumId) {
-        return albumRepository.findById(albumId)
-                .orElseThrow(() -> new AlbumNotFoundException(albumId));
+        trackService.deleteById(trackId);
     }
 
 }

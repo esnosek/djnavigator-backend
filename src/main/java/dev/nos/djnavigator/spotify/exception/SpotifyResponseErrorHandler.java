@@ -7,6 +7,7 @@ import org.springframework.web.client.ResponseErrorHandler;
 import java.io.IOException;
 
 public class SpotifyResponseErrorHandler implements ResponseErrorHandler {
+
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
         return response.getStatusCode().isError();

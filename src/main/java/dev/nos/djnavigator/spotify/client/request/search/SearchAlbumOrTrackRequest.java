@@ -3,6 +3,7 @@ package dev.nos.djnavigator.spotify.client.request.search;
 import com.fasterxml.jackson.databind.JsonNode;
 import dev.nos.djnavigator.spotify.client.request.SpotifyAuthorizedGetRequest;
 import dev.nos.djnavigator.spotify.model.SpotifySearchResults;
+import lombok.EqualsAndHashCode;
 
 import java.net.URI;
 import java.util.function.Function;
@@ -11,6 +12,7 @@ import static java.lang.String.format;
 import static java.net.URLEncoder.encode;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+@EqualsAndHashCode(callSuper = true)
 public class SearchAlbumOrTrackRequest extends SpotifyAuthorizedGetRequest<SpotifySearchResults> {
 
     private static final String URI_PATH = "https://api.spotify.com/v1/search?q=%s&type=%s&limit=%s";

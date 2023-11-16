@@ -8,6 +8,7 @@ import dev.nos.djnavigator.spotify.model.id.SpotifyPlaylistId
 import dev.nos.djnavigator.spotify.model.id.SpotifyTrackId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpStatus
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.client.MockRestServiceServer
@@ -303,10 +304,11 @@ class SpotifyControllerSpec extends Specification {
                         "message" : "Non existing id: 'spotify:track:${spotifyTrackId}'"
                     }
                 }"""
-        spotifyMock.mockNotFoundErrorOnGetSpotifyTrack(
+        spotifyMock.mockErrorOnGetSpotifyTrack(
                 once(),
                 spotifyTrackId,
-                errorResponse
+                errorResponse,
+                HttpStatus.NOT_FOUND
         )
 
         expect:
@@ -452,10 +454,11 @@ class SpotifyControllerSpec extends Specification {
                         "message" : "Non existing id: 'spotify:album:${spotifyAlbumId}'"
                     }
                 }"""
-        spotifyMock.mockNotFoundErrorOnGetSpotifyAlbum(
+        spotifyMock.mockErrorOnGetSpotifyAlbum(
                 once(),
                 spotifyAlbumId,
-                errorResponse
+                errorResponse,
+                HttpStatus.NOT_FOUND
         )
 
         expect:

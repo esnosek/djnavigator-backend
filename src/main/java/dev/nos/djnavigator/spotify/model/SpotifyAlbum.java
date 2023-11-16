@@ -32,7 +32,7 @@ public record SpotifyAlbum(
     }
 
     @JsonProperty("spotifyId")
-    public String getSpotifyAlbumId() {
+    public String spotifyAlbumId() {
         return spotifyId != null ? spotifyId.id() : null;
     }
 }

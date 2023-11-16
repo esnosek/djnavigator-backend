@@ -1,12 +1,12 @@
 package dev.nos.djnavigator.spotify.client.request;
 
-import dev.nos.djnavigator.spotify.client.HttpManager;
+import dev.nos.djnavigator.spotify.client.SpotifyHttpManager;
 
 public abstract class SpotifyGetRequest<T> extends SpotifyRequest<T> {
 
     @Override
-    public T execute(HttpManager httpManager) {
-        final var response = httpManager.executeGet(this);
-        return responseMapper().apply(response);
+    public SpotifyResponse<T> execute(SpotifyHttpManager spotifyHttpManager) {
+        final var response = spotifyHttpManager.executeGet(this);
+        return new SpotifyResponse<>(response, responseMapper());
     }
 }

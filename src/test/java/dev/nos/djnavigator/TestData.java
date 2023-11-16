@@ -35,7 +35,7 @@ public class TestData {
                 .name("track name")
                 .artists(List.of("artist1", "artist2"))
                 .tempo(new BigDecimal("123.123"))
-                .spotifyId(TrackSpotifyId.from("spotifyId"));
+                .spotifyId(TrackSpotifyId.randomId());
     }
 
     public static Album.AlbumBuilder album() {
@@ -43,7 +43,8 @@ public class TestData {
                 .createdDate(LocalDateTime.now(CLOCK).truncatedTo(MILLIS))
                 .name("album name")
                 .artists(List.of("artist1", "artist2"))
-                .spotifyId(AlbumSpotifyId.from("spotifyId"));
+                .imagePath("imagePath")
+                .spotifyId(AlbumSpotifyId.randomId());
     }
 
 
@@ -73,7 +74,7 @@ public class TestData {
         return TrackCreateDto.builder()
                 .name("track name")
                 .artists(List.of("artist1", "artist2"))
-                .albumId(AlbumId.from("albumId"))
+                .albumId(AlbumId.randomId())
                 .tempo(of(new BigDecimal("134.134")));
     }
 

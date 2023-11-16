@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import dev.nos.djnavigator.spotify.client.request.SpotifyAuthorizedGetRequest;
 import dev.nos.djnavigator.spotify.model.SpotifyPlaylist;
 import dev.nos.djnavigator.spotify.model.id.SpotifyPlaylistId;
+import lombok.EqualsAndHashCode;
 
 import java.net.URI;
 import java.util.function.Function;
 
 import static java.lang.String.format;
 
+@EqualsAndHashCode(callSuper = true)
 public class SpotifyPlaylistRequest extends SpotifyAuthorizedGetRequest<SpotifyPlaylist> {
 
     private static final String URI_PATH = "https://api.spotify.com/v1/playlists/%s";

@@ -1,6 +1,6 @@
 package dev.nos.djnavigator.config;
 
-import dev.nos.djnavigator.time.Clock;
+import dev.nos.djnavigator.utils.time.Clock;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ public class TestClockImpl implements Clock {
 
     @Override
     public LocalDateTime now() {
-        return LocalDateTime.ofInstant(fixed, ZoneId.systemDefault());
+        return LocalDateTime.ofInstant(fixed, ZoneId.of("UTC"));
     }
 
     @Override

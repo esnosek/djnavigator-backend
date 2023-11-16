@@ -40,7 +40,7 @@ public record SpotifyTrack(
     }
 
     @JsonProperty("spotifyId")
-    public String getSpotifyTrackId() {
+    public String spotifyTrackId() {
         return spotifyId != null ? spotifyId.id() : null;
     }
 }

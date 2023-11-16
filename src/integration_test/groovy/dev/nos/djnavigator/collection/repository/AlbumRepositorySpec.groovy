@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 import spock.lang.Specification
 
 import static dev.nos.djnavigator.TestData.album
+import static dev.nos.djnavigator.TestData.track
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration
@@ -16,9 +17,13 @@ import static dev.nos.djnavigator.TestData.album
 class AlbumRepositorySpec extends Specification {
 
     @Autowired
+    private TrackRepository trackRepository
+
+    @Autowired
     private AlbumRepository albumRepository
 
     void cleanup() {
+        trackRepository.deleteAll()
         albumRepository.deleteAll()
     }
 
@@ -59,4 +64,33 @@ class AlbumRepositorySpec extends Specification {
         album.isEmpty()
     }
 
+    @Transactional
+    def "should deleteAlbum delete album with all tracks"() {
+        given:
+        def album = album().build()
+        albumRepository.save(album)
+        def track1 = track()
+                .album(album)
+                .build()
+        def track2 = track()
+                .album(album)
+                .build()
+        album.addTracks(List.of(track1, track2))
+        albumRepository.save(album)
+
+        def track3 = track()
+                .album(album)
+                .build()
+        album.addTrack(track3)
+        trackRepository.save(track3)
+
+        when:
+        albumRepository.delete(album)
+
+        then:
+        trackRepository.findById(track1.id).isEmpty()
+        trackRepository.findById(track2.id).isEmpty()
+        trackRepository.findById(track3.id).isEmpty()
+        albumRepository.findById(album.id).isEmpty()
+    }
 }

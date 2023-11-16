@@ -98,16 +98,17 @@ class SpotifyMock {
                 )
     }
 
-    def mockNotFoundErrorOnGetSpotifyTrack(ExpectedCount count,
-                                           SpotifyTrackId spotifyTrackId,
-                                           String response) {
+    def mockErrorOnGetSpotifyTrack(ExpectedCount count,
+                                   SpotifyTrackId spotifyTrackId,
+                                   String response,
+                                   HttpStatus httpStatus) {
         mockServer
                 .expect(count, requestTo(URI.create("https://api.spotify.com/v1/tracks/" + spotifyTrackId)))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("Authorization", containsString("Bearer ")))
                 .andExpect(header("Content-Type", "application/json"))
                 .andRespond(
-                        withStatus(HttpStatus.NOT_FOUND)
+                        withStatus(httpStatus)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .body(parsedJson(response))
                 )
@@ -153,16 +154,17 @@ class SpotifyMock {
                 )
     }
 
-    def mockNotFoundErrorOnGetSpotifyAlbum(ExpectedCount count,
-                                           SpotifyAlbumId spotifyAlbumId,
-                                           String response) {
+    def mockErrorOnGetSpotifyAlbum(ExpectedCount count,
+                                   SpotifyAlbumId spotifyAlbumId,
+                                   String response,
+                                   HttpStatus httpStatus) {
         mockServer
                 .expect(count, requestTo(URI.create("https://api.spotify.com/v1/albums/" + spotifyAlbumId)))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("Authorization", containsString("Bearer ")))
                 .andExpect(header("Content-Type", "application/json"))
                 .andRespond(
-                        withStatus(HttpStatus.NOT_FOUND)
+                        withStatus(httpStatus)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .body(parsedJson(response))
                 )

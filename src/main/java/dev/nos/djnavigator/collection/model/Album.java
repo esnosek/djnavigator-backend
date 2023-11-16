@@ -4,7 +4,10 @@ import dev.nos.djnavigator.collection.model.converter.StringListConverter;
 import dev.nos.djnavigator.collection.model.id.AlbumId;
 import dev.nos.djnavigator.collection.model.id.AlbumSpotifyId;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,7 +19,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class Album {
 
     @EmbeddedId
@@ -32,7 +34,7 @@ public class Album {
     @Convert(converter = StringListConverter.class)
     private List<String> artists;
 
-    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Track> tracks = new ArrayList<>();
 
@@ -42,6 +44,10 @@ public class Album {
 
     @Column(name = "image_path")
     private String imagePath;
+
+    public boolean isActive() {
+        return true;
+    }
 
     public void addTrack(Track track) {
         final var tracksBySpotifyId = this.tracks

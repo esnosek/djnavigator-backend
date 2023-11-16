@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Optional;
 
 public class TrackRepositoryCustomImpl implements TrackRepositoryCustom {
 
@@ -21,18 +22,17 @@ public class TrackRepositoryCustomImpl implements TrackRepositoryCustom {
     @Override
     public List<Track> findByAlbumId(AlbumId albumId) {
         final var session = entityManager.unwrap(Session.class);
-        return session.createQuery("from Track t where t.album.spotifyId = :albumId", Track.class)
+        return session.createQuery("from Track t where t.album.id = :albumId", Track.class)
                 .setParameter("albumId", albumId)
                 .list();
     }
 
-
     @Override
-    public Track findBySpotifyId(TrackSpotifyId spotifyId) {
+    public Optional<Track> findBySpotifyId(TrackSpotifyId spotifyId) {
         final var session = entityManager.unwrap(Session.class);
         return session.createQuery("from Track t where t.spotifyId = :spotifyId", Track.class)
                 .setParameter("spotifyId", spotifyId)
-                .getSingleResult();
+                .stream().findAny();
     }
 
 }

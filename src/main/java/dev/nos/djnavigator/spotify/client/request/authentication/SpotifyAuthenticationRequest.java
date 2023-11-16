@@ -1,10 +1,11 @@
 package dev.nos.djnavigator.spotify.client.request.authentication;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import dev.nos.djnavigator.spotify.client.OAuthToken;
 import dev.nos.djnavigator.spotify.client.SpotifyClientCredentials;
 import dev.nos.djnavigator.spotify.client.request.SpotifyPostRequest;
-import dev.nos.djnavigator.time.Clock;
+import dev.nos.djnavigator.spotify.config.SpotifyToken;
+import dev.nos.djnavigator.utils.time.Clock;
+import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.LinkedMultiValueMap;
 
@@ -16,7 +17,8 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 import static org.apache.tomcat.util.codec.binary.Base64.encodeBase64;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED;
 
-public class SpotifyAuthenticationRequest extends SpotifyPostRequest<OAuthToken> {
+@EqualsAndHashCode(callSuper = false)
+public class SpotifyAuthenticationRequest extends SpotifyPostRequest<SpotifyToken> {
 
     private final static String URI_PATH = "https://accounts.spotify.com/api/token";
 
@@ -29,11 +31,11 @@ public class SpotifyAuthenticationRequest extends SpotifyPostRequest<OAuthToken>
     }
 
     @Override
-    public Function<JsonNode, OAuthToken> responseMapper() {
+    public Function<JsonNode, SpotifyToken> responseMapper() {
         return jsonNode -> {
             final var accessToken = jsonNode.get("access_token").asText();
             final var expiresIn = jsonNode.get("expires_in").asLong();
-            return new OAuthToken(
+            return new SpotifyToken(
                     accessToken,
                     Date.from(clock.instant().plusSeconds(expiresIn))
             );

@@ -14,7 +14,7 @@ public record SpotifyPlaylist(
         List<SpotifyTrack> tracks
 ) {
     @JsonProperty("spotifyId")
-    public String getSpotifyPlaylistId() {
+    public String spotifyPlaylistId() {
         return spotifyId != null ? spotifyId.id() : null;
     }
 }

@@ -1,9 +1,6 @@
 package dev.nos.djnavigator.spotify.client;
 
-import dev.nos.djnavigator.spotify.model.SpotifyAlbum;
-import dev.nos.djnavigator.spotify.model.SpotifyPlaylist;
-import dev.nos.djnavigator.spotify.model.SpotifySearchResults;
-import dev.nos.djnavigator.spotify.model.SpotifyTrack;
+import dev.nos.djnavigator.spotify.model.*;
 import dev.nos.djnavigator.spotify.model.id.SpotifyAlbumId;
 import dev.nos.djnavigator.spotify.model.id.SpotifyPlaylistId;
 import dev.nos.djnavigator.spotify.model.id.SpotifyTrackId;
@@ -11,9 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import static dev.nos.djnavigator.spotify.client.request.SpotifyThreading.executeAsync;
+import static dev.nos.djnavigator.spotify.config.SpotifyThreading.executeAsync;
 
 @Service
 public class SpotifyQueriesAsync {
@@ -26,43 +24,82 @@ public class SpotifyQueriesAsync {
     }
 
     public CompletableFuture<SpotifyTrack> trackWithAudioFeature(SpotifyTrackId spotifyTrackId) {
-        final var spotifyTrack = executeAsync((() -> spotifyApi.track(spotifyTrackId)));
-        final var audioFeatures = executeAsync((() -> spotifyApi.audioFeatures(spotifyTrackId)));
+        final var spotifyTrack = executeAsync(() ->
+                spotifyApi.track(spotifyTrackId)
+        );
+        final var audioFeatures = executeAsync(() ->
+                spotifyApi.audioFeatures(spotifyTrackId)
+        );
         return spotifyTrack
-                .thenCombine(audioFeatures, SpotifyTrack::withAudioFeatures);
+                .thenCombine(
+                        audioFeatures,
+                        SpotifyTrack::withAudioFeatures
+                );
     }
 
     public CompletableFuture<List<SpotifyTrack>> tracksWithAudioFeatures(SpotifyAlbumId spotifyAlbumId) {
-        return executeAsync((() -> spotifyApi.album(spotifyAlbumId)))
-                .thenCompose(album -> withAudioFeatures(album.spotifyTracks()));
+        final var spotifyAlbum = executeAsync(() ->
+                spotifyApi.album(spotifyAlbumId)
+        );
+        return spotifyAlbum
+                .thenCompose(album ->
+                        withAudioFeatures(album.spotifyTracks())
+                );
     }
 
     public CompletableFuture<SpotifyAlbum> albumWithTracksAndAudioFeatures(SpotifyAlbumId spotifyAlbumId) {
-        final var spotifyAlbum = executeAsync((() -> spotifyApi.album(spotifyAlbumId)));
+        final var spotifyAlbum = executeAsync(() ->
+                spotifyApi.album(spotifyAlbumId)
+        );
         return spotifyAlbum
-                .thenCompose(album -> withAudioFeatures(album.spotifyTracks()))
-                .thenCombine(spotifyAlbum, (tracks, album) -> album.withSpotifyTracks(tracks));
+                .thenCompose(album ->
+                        withAudioFeatures(album.spotifyTracks())
+                )
+                .thenCombine(
+                        spotifyAlbum,
+                        (tracks, album) -> album.withSpotifyTracks(tracks)
+                );
     }
 
     public CompletableFuture<SpotifySearchResults> searchAlbumOrTrack(String query, int limit) {
-        return executeAsync((() -> spotifyApi.searchAlbumOrTrack(query, limit)));
+        return executeAsync(() ->
+                spotifyApi.searchAlbumOrTrack(query, limit)
+        );
     }
 
     public CompletableFuture<SpotifyAlbum> albumWithTracks(SpotifyAlbumId albumId) {
-        return executeAsync((() -> spotifyApi.album(albumId)));
+        return executeAsync(() ->
+                spotifyApi.album(albumId)
+        );
     }
 
     public CompletableFuture<SpotifyPlaylist> playlist(SpotifyPlaylistId playlistId) {
-        return executeAsync((() -> spotifyApi.playlist(playlistId)));
+        return executeAsync(() ->
+                spotifyApi.playlist(playlistId)
+        );
     }
 
+    public CompletableFuture<SpotifyAudioAnalysis> audioAnalysis(SpotifyTrackId spotifyTrackId) {
+        return executeAsync(() ->
+                spotifyApi.audioAnalysis(spotifyTrackId)
+        );
+    }
 
     private CompletableFuture<List<SpotifyTrack>> withAudioFeatures(List<SpotifyTrack> spotifyTracks) {
-        return executeAsync(() -> spotifyApi.audioFeatures(spotifyIds(spotifyTracks)))
-                .thenApply(audioFeatures -> spotifyTracks.stream()
-                        .map(track -> track.withAudioFeatures(audioFeatures.get(track.spotifyId())))
-                        .toList()
+        final var tracksAudioFeatures = executeAsync(() ->
+                spotifyApi.audioFeatures(spotifyIds(spotifyTracks))
+        );
+        return tracksAudioFeatures
+                .thenApply(audioFeatures ->
+                        spotifyTracks
+                                .stream()
+                                .map(track -> withAudioFeature(track, audioFeatures))
+                                .toList()
                 );
+    }
+
+    private static SpotifyTrack withAudioFeature(SpotifyTrack track, Map<SpotifyTrackId, SpotifyTrackAudioFeatures> audioFeatures) {
+        return track.withAudioFeatures(audioFeatures.get(track.spotifyId()));
     }
 
     private static List<SpotifyTrackId> spotifyIds(List<SpotifyTrack> spotifyTracks) {

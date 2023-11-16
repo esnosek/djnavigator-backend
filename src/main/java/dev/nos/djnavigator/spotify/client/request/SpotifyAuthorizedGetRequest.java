@@ -1,9 +1,11 @@
 package dev.nos.djnavigator.spotify.client.request;
 
+import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpHeaders;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@EqualsAndHashCode(callSuper = false)
 public abstract class SpotifyAuthorizedGetRequest<T> extends SpotifyGetRequest<T> {
 
     private final String token;

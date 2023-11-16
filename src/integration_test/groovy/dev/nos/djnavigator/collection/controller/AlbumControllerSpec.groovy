@@ -8,7 +8,7 @@ import dev.nos.djnavigator.collection.repository.AlbumRepository
 import dev.nos.djnavigator.collection.repository.TrackRepository
 import dev.nos.djnavigator.config.TestConfig
 import dev.nos.djnavigator.spotify.SpotifyMock
-import dev.nos.djnavigator.time.Clock
+import dev.nos.djnavigator.utils.time.Clock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
@@ -17,6 +17,7 @@ import org.springframework.test.web.client.MockRestServiceServer
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.time.Instant
 
@@ -26,6 +27,8 @@ import static java.lang.String.format
 import static java.util.stream.StreamSupport.stream
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.containsString
+import static org.springframework.http.HttpStatus.NOT_FOUND
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS
 import static org.springframework.http.MediaType.APPLICATION_JSON
 import static org.springframework.test.web.client.ExpectedCount.once
 import static org.springframework.test.web.client.ExpectedCount.twice
@@ -105,7 +108,7 @@ class AlbumControllerSpec extends Specification {
         albumRepository.findById(albumId).isPresent()
     }
 
-    def "POST /api/albums should return 400 http code when the request body has unknown field"() {
+    def "POST /api/albums should return 400 when the request body has unknown field"() {
         given:
         def albumCreateDtoJson =
                 '''{   
@@ -133,7 +136,7 @@ class AlbumControllerSpec extends Specification {
                 }
     }
 
-    def "POST /api/albums should return 400 http code when the request body does not contain required field"() {
+    def "POST /api/albums should return 400 when the request body does not contain required field"() {
         given:
         def albumCreateDtoJson =
                 '''{   
@@ -289,7 +292,8 @@ class AlbumControllerSpec extends Specification {
                 .forEach { trackRepository.findById(TrackId.from(it)).isPresent() }
     }
 
-    def "POST /api/spotify-albums should return 404 when spotify album cannot be found"() {
+    @Unroll
+    def "POST /api/spotify-albums should return #statusCode when spotify api return #statusCode"() {
         given:
         def spotifyAlbumId = spotifyAlbum().build().spotifyId()
 
@@ -298,13 +302,14 @@ class AlbumControllerSpec extends Specification {
         def errorResponse =
                 """{
                     "error": {
-                        "message" : "Non existing id: 'spotify:album:${spotifyAlbumId}'"
+                        "message" : "some message"
                     }
                 }"""
-        spotifyMock.mockNotFoundErrorOnGetSpotifyAlbum(
+        spotifyMock.mockErrorOnGetSpotifyAlbum(
                 once(),
                 spotifyAlbumId,
-                errorResponse
+                errorResponse,
+                statusCode
         )
 
         expect:
@@ -319,15 +324,17 @@ class AlbumControllerSpec extends Specification {
                 .accept(APPLICATION_JSON)
                 .exchange()
                 .expectStatus()
-                .isNotFound()
+                .isEqualTo(statusCode)
                 .expectBody()
                 .jsonPath("message")
                 .value { message ->
                     assertThat(
                             message,
-                            containsString("Non existing id: 'spotify:album:${spotifyAlbumId}'")
+                            containsString("some message")
                     )
                 }
+        where:
+        statusCode << [NOT_FOUND, TOO_MANY_REQUESTS]
     }
 
     def "GET /api/albums/{id} should return album"() {
@@ -341,7 +348,8 @@ class AlbumControllerSpec extends Specification {
                     "name":"album name",
                     "artists":["artist1","artist2"],
                     "tracks":[],
-                    "spotifyId":"spotifyId"
+                    "imagePath":"imagePath",
+                    "spotifyId":"${album.getSpotifyId()}"
                 }"""
 
         expect:
@@ -350,11 +358,11 @@ class AlbumControllerSpec extends Specification {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(String.class)
-                .isEqualTo(parsedJson(expectedResponse))
+                .expectBody(JsonNode.class)
+                .value { assertJson(it.toString(), expectedResponse) }
     }
 
-    def "should GET /api/albums/{id} return 404 http code when album cannot be found in the collection"() {
+    def "GET /api/albums/{id} should return 404 when album cannot be found in the collection"() {
         expect:
         client.get()
                 .uri("/api/albums/1234")
@@ -388,6 +396,7 @@ class AlbumControllerSpec extends Specification {
                         "name":"album name",
                         "artists":["artist1","artist2"],
                         "tracks":[],
+                        "imagePath":"imagePath",
                         "spotifyId":"spotifyId1"
                     },
                     {   
@@ -396,6 +405,7 @@ class AlbumControllerSpec extends Specification {
                         "name":"album name",
                         "artists":["artist1","artist2"],
                         "tracks":[],
+                        "imagePath":"imagePath",
                         "spotifyId":"spotifyId2"
                     }
                 ]"""
@@ -405,11 +415,11 @@ class AlbumControllerSpec extends Specification {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(String.class)
-                .isEqualTo(parsedJson(expectedResponse))
+                .expectBody(JsonNode.class)
+                .value { assertJson(it.toString(), expectedResponse) }
     }
 
-    def "DELETE /api/albums/{id} should delete album from collection"() {
+    def "DELETE /api/albums/{id} should delete album from the collection"() {
         given:
         def album = albumRepository.save(album().build())
 
@@ -424,7 +434,7 @@ class AlbumControllerSpec extends Specification {
         albumRepository.findById(album.id).isEmpty()
     }
 
-    def "DELETE /api/albums/{id} should return 404 http code when album cannot be found in the collection"() {
+    def "DELETE /api/albums/{id} should return 404 when album cannot be found in the collection"() {
         expect:
         client.delete()
                 .uri("/api/albums/1234")

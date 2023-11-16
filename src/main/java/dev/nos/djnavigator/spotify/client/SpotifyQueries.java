@@ -51,7 +51,6 @@ public class SpotifyQueries {
         return spotifyApi.playlist(playlistId);
     }
 
-
     private List<SpotifyTrack> withAudioFeatures(List<SpotifyTrack> spotifyTracks) {
         final var audioFeatures = spotifyApi.audioFeatures(spotifyIds(spotifyTracks));
         return spotifyTracks.stream()

@@ -14,7 +14,7 @@ public record SpotifyTrackAudioFeatures(
         BigDecimal tempo
 ) {
     @JsonProperty("id")
-    public String getSpotifyTrackId() {
+    public String spotifyTrackId() {
         return id != null ? id.id() : null;
     }
 }

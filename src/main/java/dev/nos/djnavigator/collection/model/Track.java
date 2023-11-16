@@ -4,7 +4,10 @@ import dev.nos.djnavigator.collection.model.converter.StringListConverter;
 import dev.nos.djnavigator.collection.model.id.TrackId;
 import dev.nos.djnavigator.collection.model.id.TrackSpotifyId;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,7 +18,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class Track {
 
     @EmbeddedId
@@ -31,7 +33,7 @@ public class Track {
     @Convert(converter = StringListConverter.class)
     private List<String> artists;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "album_id")
     private Album album;
 
